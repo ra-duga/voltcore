@@ -36,6 +36,7 @@
 			}
 			$this->title="";
 			$this->class="";
+			$this->tabId="";
 			$this->footData=array();
 		}
 		
