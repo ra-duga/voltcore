@@ -1,5 +1,5 @@
 <?php if(!$data) return; ?>
-<table <?php if ($tabId){ ?> id=<?php echo "'$tabId'"; ?> <?php if ($class){ ?> class=<?php echo "'$class'"; ?>  <?php } ?>>
+<table <?php if ($tabId){ ?> id=<?php echo "'$tabId'"; ?> <?php } if ($class){ ?> class=<?php echo "'$class'"; ?>  <?php } ?>>
 <?php if ($title){ ?>
 	<caption><?php echo $title; ?></caption>
 <?php } ?>
@@ -10,6 +10,7 @@
 <?php } ?>
 		</tr>
 	</thead>
+<?php if($footData)	{ ?>
 	<tfoot>
 		<tr>
 <?php foreach($footData as $tfoot) {?>
@@ -17,6 +18,7 @@
 <?php } ?>
 		</tr>
 	</tfoot>
+<?php } ?>
 	<tbody>
 <?php foreach($data as $row){ ?>
 		<tr>
