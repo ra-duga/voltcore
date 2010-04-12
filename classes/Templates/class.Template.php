@@ -13,7 +13,9 @@
 	 * 
 	 * Клас реализует возможности работы с нативными шаблонами
 	 * 
-	 * @author [vs]
+	 * @author Костин Алексей Васильевич aka Volt(220)
+	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
+	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
 	 * @package classes
 	 * @subpackage templates
 	 */
@@ -60,7 +62,27 @@
 			}
 			return $this->vars[$var];
 		}
-
+		
+		/**
+		 * Вытаскивает из массива значения для переменых шаблона.
+		 * 
+		 * В случае асоциативного массива присваивает переменной шаблона с именем ключа массива соответсвующее значение массива.
+		 * Если массив нумерованный (или имена начинаются с цифр), то создаются переменные типа vN, где N ключ массива.  
+		 * 
+		 * @param array $arr Массив со значениями.
+		 */
+		public function arraySet($arr){
+			foreach($arr as $key=>$val){
+				if ($key+0==0){
+					$this->$key=$val;
+				}
+				else{
+					$var="v".$key;
+					$this->$var=$val;
+				}
+			}
+		}
+		
 		/**
 		 * Выполнение шаблона
 		 * @return string Результат выполнения шаблона
