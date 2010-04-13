@@ -1,10 +1,11 @@
 <?php
 	/**
-	 * Файл настроек 
+	 * Пример стандартного файла настроек 
 	 *
-	 * @author Костин Алексей Васильевич aka Volt(220)
-	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
-	 * @version 1.0
+	 * @author 
+	 * @copyright 
+	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
+	 * @version 
 	 * @package 
 	 */
 	
@@ -18,7 +19,25 @@
 	define("DOCROOT",dirname(__FILE__));
 	
 	/**
+	 * Директория логов.
+	 * 
+	 * @var string 
+	 */
+	define("LOGDIR",DOCROOT."/admin/logs");
+	
+	/**
+	 * Префикс файлов логов.
+	 * 
+	 * @var string 
+	 */
+	define("LOG_PREFIX","/autoAuth_");
+	
+	/**
 	 * Подключение VoltCore
 	 */
 	require_once("/Frameworks/VoltCore/VoltCore.php");
+	
+	//$vf["db"]["base"]="testBase";			// Тестовая база
+	//$vf["db"]["sqlLog"]=true;				// Логировать ли запросы
+	
 ?>
