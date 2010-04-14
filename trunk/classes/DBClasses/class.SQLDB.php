@@ -681,7 +681,7 @@
 			
 			$expr=$this->getWhere($where);
 			if($expr){
-				$sql="delete from $tab where ".$expr;
+				$sql="delete from ".$tab.$expr;
 			}
 			else{
 				$sql=trim($tab."");
