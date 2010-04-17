@@ -109,11 +109,13 @@
 	$vf["exc"]["formatExcLog"]=true;		// Логировать ли FormatException
 	$vf["exc"]["voltExcLog"]=true;			// Логировать ли VoltException
 	
-	
 	//Стандартные дирректории
 	$vf["dir"]["js"]=DOCROOT."/js";					// Дирректория с javascript файлами
 	$vf["dir"]["css"]=DOCROOT."/css";				// Дирректория с файлами стилей
 	$vf["dir"]["php"]=DOCROOT."/modules";			// Дирректория с php файлами
+	
+	$vf["tpl"]["cache"]=false;						// Кшировать ли шаблоны
+	$vf["tpl"]["cacheDir"]=DOCROOT."/cache";		// Дирректория для кэша
 	
 	set_error_handler('errors');
 	/**

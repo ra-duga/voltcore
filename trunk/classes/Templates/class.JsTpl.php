@@ -22,8 +22,8 @@
 		/**
 		 * Конструктор.
 		 */
-		public function __construct(){
-			parent::__construct(VCROOT."/Templates/linkJs.tpl");
+		public function __construct($cache=null){
+			parent::__construct(VCROOT."/Templates/linkJs.tpl",$cache);
 			$jsFiles=getJSFiles();
 			$rightArr=array();
 			foreach($jsFiles as $file){

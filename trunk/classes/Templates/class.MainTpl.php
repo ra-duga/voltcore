@@ -22,8 +22,8 @@
 		/**
 		 * Конструктор.
 		 */
-		public function __construct(){
-			parent::__construct(VCROOT."/Templates/main.tpl");
+		public function __construct($cache=null){
+			parent::__construct(VCROOT."/Templates/main.tpl",$cache);
 			$this->css=new CssTpl();
 			$this->js=new JsTpl();
 			$this->pageTitle="Главная страница";

@@ -26,8 +26,8 @@
 		 * 
 		 * @param mixed $res Данные для таблицы. Результат запроса к БД или двумерный массив.
 		 */
-		public function __construct($res){
-			parent::__construct(VCROOT."/Templates/table.tpl");
+		public function __construct($res, $cache=null){
+			parent::__construct(VCROOT."/Templates/table.tpl", $cache);
 			if (is_array($res)){
 				$this->data=$res;
 			}

@@ -22,8 +22,8 @@
 		/**
 		 * Конструктор.
 		 */
-		public function __construct(){
-			parent::__construct(VCROOT."/Templates/moduls.tpl");
+		public function __construct($cache=null){
+			parent::__construct(VCROOT."/Templates/moduls.tpl", $cache);
 			$arrFiles=getPHPFiles();
 			$rightArr=array();
 			foreach($arrFiles as $file){
