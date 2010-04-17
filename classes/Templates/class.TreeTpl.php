@@ -30,15 +30,15 @@
 		 * @param array $tree Дерево.
 		 * @param int $tplType Тип шаблона (список, extjs дерево, extjs дерево в таблице).
 		 */
-		public function __construct($tree, $tplType=TreeTpl::UL){
+		public function __construct($tree, $tplType=TreeTpl::UL, $cache=null){
 			switch ($tplType) {
-				case TreeTpl::UL: parent::__construct(VCROOT."/Templates/tree.tpl"); break;
-				case TreeTpl::EXTJS: parent::__construct(VCROOT."/Templates/extJSTree.tpl"); break;
+				case TreeTpl::UL: parent::__construct(VCROOT."/Templates/tree.tpl", $cache); break;
+				case TreeTpl::EXTJS: parent::__construct(VCROOT."/Templates/extJSTree.tpl", $cache); break;
 				case TreeTpl::EXTJSTABLE: 
-					parent::__construct(VCROOT."/Templates/extJSTableTree.tpl"); 
+					parent::__construct(VCROOT."/Templates/extJSTableTree.tpl", $cache); 
 					$this->provider="col";
-					break;
-				default: parent::__construct(VCROOT."/Templates/tree.tpl");
+				break;
+				default: parent::__construct(VCROOT."/Templates/tree.tpl", $cache);
 			}
 			$this->tree=$tree;
 		}

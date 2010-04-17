@@ -24,8 +24,8 @@
 		 * 
 		 * @param String $path Путь к файлу шаблона
 		 */
-		public function __construct($path){
-			parent::__construct($path);
+		public function __construct($path, $cache=null){
+			parent::__construct($path,$cache);
 			$this->files=array();
 		}
 		
