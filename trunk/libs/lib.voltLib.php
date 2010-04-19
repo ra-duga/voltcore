@@ -32,5 +32,18 @@
 			return iconv($from, $to, $sbj);
 		}
 	}
-
+	
+	/**
+	 * Выполняет ksort для подмассивов.
+	 * 
+	 * @param array $arr Массив для сортировки.
+	 */
+	function deepKsort(&$arr){
+		ksort($arr);
+		foreach($arr as $key=>$val){
+			if (is_array($val)){
+				deepKsort($arr[$key]);
+			}
+		}
+	}
 ?>
