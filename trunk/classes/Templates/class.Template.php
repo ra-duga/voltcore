@@ -120,6 +120,9 @@
 		 */
 		protected function getCacheFileName(){
 			global $vf;
+			if(!file_exists($vf["tpl"]["cacheDir"])){
+				mkdir($vf["tpl"]["cacheDir"]);
+			}
 			return $vf["tpl"]["cacheDir"]."/".basename($this->path, ".tpl")."_".$this->hashCode();
 		}
 		
