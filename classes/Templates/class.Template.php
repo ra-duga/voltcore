@@ -106,6 +106,10 @@
 				if ($var instanceof Template){
 					$hash = md5($key.$var->hashCode().$hash);
 				}
+				elseif(is_array($var)){
+					deepKsort($var);
+					$hash = md5($key.json_encode($var).$hash);
+				}
 				else{
 					$hash = md5($key.$var.$hash);
 				}
