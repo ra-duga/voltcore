@@ -21,9 +21,12 @@
 
 		/**
 		 * Конструктор.
+		 * 
+		 * @param boolean $cache Нужно ли кэширование шаблона.
+		 * @param string $dir Дирректория для кэша шаблона.
 		 */
-		public function __construct($cache=null){
-			parent::__construct(VCROOT."/Templates/linkCss.tpl",$cache);
+		public function __construct($cache=null, $dir=null){
+			parent::__construct(VCROOT."/Templates/linkCss.tpl",$cache, $dir);
 			$cssFiles=getCSSFiles();
 			$rightArr=array();
 			foreach($cssFiles as $file){

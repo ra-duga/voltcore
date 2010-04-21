@@ -21,9 +21,12 @@
 		
 		/**
 		 * Конструктор.
+		 * 
+		 * @param boolean $cache Нужно ли кэширование шаблона.
+		 * @param string $dir Дирректория для кэша шаблона.
 		 */
-		public function __construct($cache=null){
-			parent::__construct(VCROOT."/Templates/moduls.tpl", $cache);
+		public function __construct($cache=null, $dir=null){
+			parent::__construct(VCROOT."/Templates/moduls.tpl", $cache, $dir);
 			$arrFiles=getPHPFiles();
 			$rightArr=array();
 			foreach($arrFiles as $file){
