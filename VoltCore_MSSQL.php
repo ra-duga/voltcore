@@ -113,7 +113,7 @@
 	$vf["dir"]["php"]=DOCROOT."/modules";			// Дирректория с php файлами
 	$vf["dir"]["cache"]=DOCROOT."/cache";			// Дирректория для кэша
 	
-	$vf["tpl"]["needCache"]=false;						// Кшировать ли шаблоны
+	$vf["tpl"]["needCache"]=false;					// Кшировать ли шаблоны
 		
 	set_error_handler('errors');
 	
