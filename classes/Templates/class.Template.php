@@ -40,18 +40,28 @@
 		protected $needCache=null;
 
 		/**
-		 * Конструктор
-		 * 
-		 * @param String $path Путь к файлу шаблона
+		 * Дирректория для кэша шаблона.
+		 * @var string
 		 */
-		public function __construct($path, $cache=null){
+		protected $cacheDir=null;
+		
+		/**
+		 * Конструктор.
+		 * 
+		 * @param string $path Путь к файлу шаблона.
+		 * @param boolean $cache Нужно ли кэширование шаблона.
+		 * @param string $dir Дирректория для кэша шаблона.
+		 */
+		public function __construct($path, $cache=null, $dir=null){
 			global $vf;
 			$this->path=$path;
-			$this->needCache=$cache===null ? $vf["tpl"]["cache"] : $cache;
+			$this->needCache= $cache==null ? $vf["tpl"]["needCache"] : $cache;
+			$this->cacheDir= $dir==null ? $vf["dir"]["cacheDir"] : $dir;
 		}
 
 		/**
-		 * Магическая запись переменной в буфер 
+		 * Магическая запись переменной в буфер.
+		 * 
 		 * @param string $var Имя переменной
 		 * @param mixed $val Значение переменной
 		 */
@@ -61,6 +71,7 @@
 		
 		/**
 		 * Мангическое получение значения переменной.
+		 * 
 		 * @param string $var Имя переменной
 		 * @return mixed Значение переменной
 		 */
@@ -94,40 +105,37 @@
 		/**
 		 * Высчитывает хэш шаблона.
 		 * 
-		 * Чтобы уникально определить шаблон, нужно сравнить его имя и набор переменных.
-		 * Фукция вычисляет хэш от переменных, для проверки на совпадение.
-		 * 
 		 * @return string Хэш шаблона.    
 		 */
 		public function hashCode(){
 			$hash = 0;
-			ksort($this->vars);
-			foreach($this->vars as $key=>$var){
-				if ($var instanceof Template){
-					$hash = md5($key.$var->hashCode().$hash);
-				}
-				elseif(is_array($var)){
-					deepKsort($var);
-					$hash = md5($key.json_encode($var).$hash);
-				}
-				else{
-					$hash = md5($key.$var.$hash);
-				}
-			}
+			$this->ksortVars();
+			$hash = md5(serialize($this));
 			return $hash;
 		}
-				
+		
+		/**
+		 * Сортирует массивы переменных шаблона и подшаблонов по ключам.
+		 */
+		public function ksortVars(){
+			deepKsort($this->vars);
+			foreach($this->vars as $var){
+				if ($var instanceof Template){
+					$var->ksortVars();
+				}
+			}
+		}
+						
 		/**
 		 * Возвращает имя файла с кэшем.
 		 * 
  		 * @return string Имя файла с кэшем.    
 		 */
 		protected function getCacheFileName(){
-			global $vf;
-			if(!file_exists($vf["tpl"]["cacheDir"])){
-				mkdir($vf["tpl"]["cacheDir"]);
+			if(!file_exists($this->cacheDir)){
+				mkdir($this->cacheDir);
 			}
-			return $vf["tpl"]["cacheDir"]."/".basename($this->path, ".tpl")."_".$this->hashCode();
+			return $this->cacheDir."/".basename($this->path, ".tpl")."_".$this->hashCode();
 		}
 		
 		/**

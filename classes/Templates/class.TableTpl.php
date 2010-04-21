@@ -25,9 +25,11 @@
 		 * Конструктор.
 		 * 
 		 * @param mixed $res Данные для таблицы. Результат запроса к БД или двумерный массив.
+		 * @param boolean $cache Нужно ли кэширование шаблона.
+		 * @param string $dir Дирректория для кэша шаблона.
 		 */
-		public function __construct($res, $cache=null){
-			parent::__construct(VCROOT."/Templates/table.tpl", $cache);
+		public function __construct($res, $cache=null, $dir=null){
+			parent::__construct(VCROOT."/Templates/table.tpl", $cache, $dir);
 			if (is_array($res)){
 				$this->data=$res;
 			}

@@ -21,9 +21,12 @@
 		
 		/**
 		 * Конструктор.
+		 * 
+		 * @param boolean $cache Нужно ли кэширование шаблона.
+		 * @param string $dir Дирректория для кэша шаблона.
 		 */
-		public function __construct($cache=null){
-			parent::__construct(VCROOT."/Templates/main.tpl",$cache);
+		public function __construct($cache=null, $dir=null){
+			parent::__construct(VCROOT."/Templates/main.tpl",$cache, $dir);
 			$this->css=new CssTpl();
 			$this->js=new JsTpl();
 			$this->pageTitle="Главная страница";

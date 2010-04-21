@@ -23,9 +23,11 @@
 		 * Конструктор.
 		 * 
 		 * @param String $path Путь к файлу шаблона
+		 * @param boolean $cache Нужно ли кэширование шаблона.
+		 * @param string $dir Дирректория для кэша шаблона.
 		 */
-		public function __construct($path, $cache=null){
-			parent::__construct($path,$cache);
+		public function __construct($path, $cache=null, $dir=null){
+			parent::__construct($path,$cache, $dir);
 			$this->files=array();
 		}
 		

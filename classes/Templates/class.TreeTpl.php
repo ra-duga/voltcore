@@ -29,16 +29,18 @@
 		 * 
 		 * @param array $tree Дерево.
 		 * @param int $tplType Тип шаблона (список, extjs дерево, extjs дерево в таблице).
+		 * @param boolean $cache Нужно ли кэширование шаблона.
+		 * @param string $dir Дирректория для кэша шаблона.
 		 */
-		public function __construct($tree, $tplType=TreeTpl::UL, $cache=null){
+		public function __construct($tree, $tplType=TreeTpl::UL, $cache=null, $dir=null){
 			switch ($tplType) {
-				case TreeTpl::UL: parent::__construct(VCROOT."/Templates/tree.tpl", $cache); break;
-				case TreeTpl::EXTJS: parent::__construct(VCROOT."/Templates/extJSTree.tpl", $cache); break;
+				case TreeTpl::UL: parent::__construct(VCROOT."/Templates/tree.tpl", $cache, $dir); break;
+				case TreeTpl::EXTJS: parent::__construct(VCROOT."/Templates/extJSTree.tpl", $cache, $dir); break;
 				case TreeTpl::EXTJSTABLE: 
-					parent::__construct(VCROOT."/Templates/extJSTableTree.tpl", $cache); 
+					parent::__construct(VCROOT."/Templates/extJSTableTree.tpl", $cache, $dir); 
 					$this->provider="col";
 				break;
-				default: parent::__construct(VCROOT."/Templates/tree.tpl", $cache);
+				default: parent::__construct(VCROOT."/Templates/tree.tpl", $cache, $dir);
 			}
 			$this->tree=$tree;
 		}
