@@ -56,7 +56,7 @@
 			global $vf;
 			$this->path=$path;
 			$this->needCache= $cache==null ? $vf["tpl"]["needCache"] : $cache;
-			$this->cacheDir= $dir==null ? $vf["dir"]["cacheDir"] : $dir;
+			$this->cacheDir= $dir==null ? $vf["dir"]["cache"] : $dir;
 		}
 
 		/**
