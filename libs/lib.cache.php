@@ -48,7 +48,8 @@
 	 * @param $dir Дирректория с кэшем.
 	 */
 	function getCacheFromFile($key, $dir=null){
-		if (file_exists(getCacheFileName($key, $dir))){
+		$cacheFileName=getCacheFileName($key, $dir);
+		if (file_exists($cacheFileName)){
 			return file_get_contents($cacheFileName);
 		}
 		return null;
