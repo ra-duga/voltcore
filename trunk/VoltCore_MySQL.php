@@ -23,6 +23,11 @@
 	require_once("libs/lib.logger.php"); 
 	
 	/**
+	 * Подключение библиотеки кэширования
+	 */
+	require_once("libs/lib.cache.php"); 
+	
+	/**
 	 * Подключение полезных функций, которые логически не объединяются в библиотеку с говорящим названием.
 	 */
 	require_once("libs/lib.voltLib.php"); 
@@ -110,12 +115,14 @@
 	$vf["exc"]["voltExcLog"]=true;			// Логировать ли VoltException
 	
 	//Стандартные дирректории
-	$vf["dir"]["js"]=DOCROOT."/js";					// Дирректория с javascript файлами
-	$vf["dir"]["css"]=DOCROOT."/css";				// Дирректория с файлами стилей
-	$vf["dir"]["cache"]=DOCROOT."/cache";			// Дирректория для кэша
+	$vf["dir"]["js"]=DOCROOT."/js";			// Дирректория с javascript файлами
+	$vf["dir"]["css"]=DOCROOT."/css";		// Дирректория с файлами стилей
+	$vf["dir"]["cache"]=DOCROOT."/cache";	// Дирректория для кэша
 	
-	$vf["tpl"]["needCache"]=false;						// Кшировать ли шаблоны
-		
+	$vf["tpl"]["needCache"]=false;			// Кэшировать ли шаблоны
+
+	$vf["cache"]["defType"]="file";			// Куда кэшировать по умолчанию
+	
 	set_error_handler('errors');
 	/**
 	 * Обрабатывает ошибки, возникающие во время выполнения.
