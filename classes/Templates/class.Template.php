@@ -57,18 +57,12 @@
 			$this->path=$path;
 			$this->needCache= $cache==null ? $vf["tpl"]["needCache"] : $cache;
 			$this->cacheDir= $dir==null ? $vf["dir"]["cache"] : $dir;
+			
+			if(!file_exists($this->cacheDir)){
+				mkdir($this->cacheDir);
+			}
 		}
 
-		/**
-		 * Магическая запись переменной в буфер.
-		 * 
-		 * @param string $var Имя переменной
-		 * @param mixed $val Значение переменной
-		 */
-		public function __set($var, $val){
-			$this->vars[$var]=$val;
-		}
-		
 		/**
 		 * Мангическое получение значения переменной.
 		 * 
@@ -80,6 +74,16 @@
 				return $this->$var;
 			}
 			return $this->vars[$var];
+		}
+		
+		/**
+		 * Магическая запись переменной в буфер.
+		 * 
+		 * @param string $var Имя переменной
+		 * @param mixed $val Значение переменной
+		 */
+		public function __set($var, $val){
+			$this->vars[$var]=$val;
 		}
 		
 		/**
@@ -108,34 +112,30 @@
 		 * @return string Хэш шаблона.    
 		 */
 		public function hashCode(){
-			$hash = 0;
-			$this->ksortVars();
 			$hash = md5(serialize($this));
 			return $hash;
 		}
 		
 		/**
-		 * Сортирует массивы переменных шаблона и подшаблонов по ключам.
+		 * Подготавливает объект к сериализации.
+		 * 
+		 * Т.к. объект этого класса обычно сериализуется для вычисления уникольного ключа объекта,
+		 * то подготовка к сериализации заключается в обеспечении создания одинаковых строк для 
+		 * одинаковых переменных в $vars, но указанных в разной последовательности.
+		 * По сути метод сортирует массив переменных шаблона по ключам.
 		 */
-		public function ksortVars(){
+		public function __sleep(){
 			deepKsort($this->vars);
-			foreach($this->vars as $var){
-				if ($var instanceof Template){
-					$var->ksortVars();
-				}
-			}
+			return array_keys(get_class_vars(__CLASS__));
 		}
-						
+								
 		/**
 		 * Возвращает имя файла с кэшем.
 		 * 
  		 * @return string Имя файла с кэшем.    
 		 */
-		protected function getCacheFileName(){
-			if(!file_exists($this->cacheDir)){
-				mkdir($this->cacheDir);
-			}
-			return $this->cacheDir."/".basename($this->path, ".tpl")."_".$this->hashCode();
+		protected function getCacheKey(){
+			return basename($this->path, ".tpl")."_".$this->hashCode();
 		}
 		
 		/**
@@ -145,13 +145,14 @@
 		 */
 		public function __toString(){
 			if ($this->needCache){
-				$cacheFileName=$this->getCacheFileName();
-				if (file_exists($cacheFileName)){
-					return file_get_contents($cacheFileName);
+				$cacheKey=$this->getCacheKey();
+				$rez=getCacheFromFile($cacheKey, $this->cacheDir);
+				if (!is_null($rez)){
+					return $rez;
 				}
 				else{
 					$rez=$this->compile();		
-					file_put_contents($cacheFileName, $rez);
+					cacheToFile($cacheKey, $rez, $this->cacheDir);
 					return $rez;
 				}
 			}

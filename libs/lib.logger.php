@@ -68,7 +68,7 @@
 	 * @param Exception $e исключение для логирования
 	 * @param string $fil Ключ в массиве $vf["log"], соответствующий нужному файлу.
 	 */
-		function excLog(Exception $e, $fil='log'){
+	function excLog(Exception $e, $fil='log'){
 		$par  = "File:".$e->getFile().";";
 		$par .= "Line:".$e->getLine().";";
 		$type='debug';
