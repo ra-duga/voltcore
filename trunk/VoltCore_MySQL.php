@@ -16,43 +16,43 @@
 	// Настройки вывода ошибок
 	error_reporting(E_ALL);
 	ini_set("display_errors", "off");
-	
-	/**
-	 * Подключение библиотеки логирования
-	 */
-	require_once("libs/lib.logger.php"); 
-	
-	/**
-	 * Подключение библиотеки кэширования
-	 */
-	require_once("libs/lib.cache.php"); 
-	
-	/**
-	 * Подключение полезных функций, которые логически не объединяются в библиотеку с говорящим названием.
-	 */
-	require_once("libs/lib.voltLib.php"); 
 
-	/**
-	 * Подключение функций работы с файлами.
-	 */
-	require_once("libs/lib.files.php"); 
-
-	/**
-	 * Подключение функций работы с extJS.
-	 */
-	require_once("libs/lib.extJS.php"); 
-	
-	/**
-	 * Подключение автозагрузчика
-	 */
-	require_once("autoload.php");
-	
 	/**
 	 * Корень фреймворка.
 	 * 
 	 * @var string 
 	 */
 	define("VCROOT",dirname(__FILE__));
+	
+	/**
+	 * Подключение библиотеки логирования
+	 */
+	require_once(VCROOT."/libs/lib.logger.php"); 
+	
+	/**
+	 * Подключение библиотеки кэширования
+	 */
+	require_once(VCROOT."/libs/lib.cache.php"); 
+	
+	/**
+	 * Подключение полезных функций, которые логически не объединяются в библиотеку с говорящим названием.
+	 */
+	require_once(VCROOT."/libs/lib.voltLib.php"); 
+
+	/**
+	 * Подключение функций работы с файлами.
+	 */
+	require_once(VCROOT."/libs/lib.files.php"); 
+
+	/**
+	 * Подключение функций работы с extJS.
+	 */
+	require_once(VCROOT."/libs/lib.extJS.php"); 
+	
+	/**
+	 * Подключение автозагрузчика
+	 */
+	require_once(VCROOT."/autoload.php");
 	
 	if (!defined("LOGDIR")){
 		/**
