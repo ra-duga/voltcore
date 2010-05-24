@@ -17,6 +17,20 @@
 	 * @var string 
 	 */
 	define("DOCROOT",dirname(__FILE__));
+
+	/**
+	 * Базовый адрес модуля.
+	 * 
+	 * @var string 
+	 */
+	define("URLROOT","http://mysite.com");
+	
+	/**
+	 * Директория c объектами.
+	 * 
+	 * @var string 
+	 */
+	define("OBJDIR",DOCROOT."/objs");
 	
 	/**
 	 * Директория логов.
@@ -30,7 +44,14 @@
 	 * 
 	 * @var string 
 	 */
-	define("LOG_PREFIX","/autoAuth_");
+	define("LOG_PREFIX","/mylog_");
+	
+	/**
+	 * Уровень ошибок для логирования.
+	 * 
+	 * @var int
+	 */
+	define("ERR_LOG_LEVEL",0);
 	
 	/**
 	 * Подключение VoltCore

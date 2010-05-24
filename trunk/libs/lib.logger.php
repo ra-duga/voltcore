@@ -8,7 +8,7 @@
 	 * @author Костин Алексей Васильевич aka Volt(220)
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
-	 * @version 1.0
+	 * @version 1.5
 	 * @package voltcore
 	 * @subpackage libs
 	 */
@@ -32,7 +32,7 @@
 			$masPar=implode("|",$masPar);
 		}
 		$logText=$mes."|".$type."|".$masPar."|".date("d-m-Y H:i:s").PHP_EOL;
-		file_put_contents($vf["log"]["dir"].$file, $logText, FILE_APPEND);
+		file_put_contents($file, $logText, FILE_APPEND);
 		}
 
 	/**
@@ -99,7 +99,7 @@
 			$masPar=implode("|",$masPar);
 		}
 		$logText=$mes."|".$type."|".$masPar."|".date("d-m-Y H:i:s")."\r\n";
-		$logFile=$vf["log"]["dir"].$vf["log"][$fil];
+		$logFile=$vf["log"][$fil];
 		file_put_contents($logFile, $logText, FILE_APPEND);
 	}
 	

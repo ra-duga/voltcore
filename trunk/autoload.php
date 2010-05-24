@@ -6,19 +6,22 @@
 	 * @author Костин Алексей Васильевич aka Volt(220)
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
- 	 * @version 1.2
+ 	 * @version 1.3
 	 * @package voltcore
 	 */
  
  	/**
 	 * Получение всех файлов.
 	 * 
+	 * Функция составляет список файлов для автолоада. 
+	 * Предполагается что классы лежат в файлах типа class.name.php, где name имя класса.
+	 * 
 	 * @param string $dir Директория сканирования.
 	 * @param array $allFiles Результат сканирования.
 	 */
 	function scanFiles($dir, &$allFiles) {
 		if (!is_dir($dir)) return;
-		$cont=glob($dir."/*");
+		$cont=glob($dir."/class.*.php");
 		if(!$cont) return;
 		
 		foreach($cont as $file){
@@ -37,6 +40,24 @@
 			}
 		}
 	}
+	
+	/**
+	 * Запускает поиск файлов классов по всем указанным директориям.
+	 * 
+	 * @param array $dirs Результирующий массив файлов
+	 */
+	function makeDirs(&$dirs){
+		global $vf;
+		$dirs=getFromCache('vfClasses');
+		if (!is_null($dirs)){
+			return unserialize($dirs);
+		}
+		$dirs=array();
+		foreach($vf['dir']['classes'] as $dir){
+			scanFiles($dir, $dirs);
+		}
+		cacheIt('vfClasses', serialize($dirs));
+	}
  
  	/**
 	 * Функция автозагрузки файлов классов.
@@ -49,7 +70,7 @@
 		static $dirs = false;
  
 		if(!$dirs) {
-			scanFiles(VCROOT.'/classes/',$dirs);
+			makeDirs($dirs);
 		}
  
 		$classname = strtolower($class);
