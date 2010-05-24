@@ -5,7 +5,7 @@
 	 * @author Костин Алексей Васильевич aka Volt(220)
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
- 	 * @version 1.$Id$
+ 	 * @version 1.$LastChangedRevision$
 	 * @package voltcore
 	 */
 
