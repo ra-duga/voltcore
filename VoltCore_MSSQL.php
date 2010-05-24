@@ -116,6 +116,7 @@
 	$vf["dir"]["js"]=DOCROOT."/js";			// Дирректория с javascript файлами
 	$vf["dir"]["css"]=DOCROOT."/css";		// Дирректория с файлами стилей
 	$vf["dir"]["php"]=DOCROOT."/modules";	// Дирректория с php файлами
+	$vf["dir"]["tpls"]=DOCROOT."/templates";// Дирректория с файлами шаблонов
 	$vf["dir"]["cache"]=DOCROOT."/cache";	// Дирректория для кэша
 	
 	$vf["tpl"]["needCache"]=false;			// Кшировать ли шаблоны

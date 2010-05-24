@@ -117,6 +117,7 @@
 	//Стандартные дирректории
 	$vf["dir"]["js"]=DOCROOT."/js";			// Дирректория с javascript файлами
 	$vf["dir"]["css"]=DOCROOT."/css";		// Дирректория с файлами стилей
+	$vf["dir"]["tpls"]=DOCROOT."/templates";// Дирректория с файлами шаблонов
 	$vf["dir"]["cache"]=DOCROOT."/cache";	// Дирректория для кэша
 	
 	$vf["tpl"]["needCache"]=false;			// Кэшировать ли шаблоны

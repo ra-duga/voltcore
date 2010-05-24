@@ -52,7 +52,7 @@
 		 * @param boolean $cache Нужно ли кэширование шаблона.
 		 * @param string $dir Дирректория для кэша шаблона.
 		 */
-		public function __construct($path, $cache=null, $dir=null){
+		public function __construct($path=null, $cache=null, $dir=null){
 			global $vf;
 			$this->path=$path;
 			$this->needCache= $cache==null ? $vf["tpl"]["needCache"] : $cache;
@@ -86,6 +86,25 @@
 			$this->vars[$var]=$val;
 		}
 		
+		/**
+		 * Устанавливает путь к файлу шаблона из дирректории с шаблонами.
+		 * 
+		 * @param string $file Путь к файлу шаблона из дирректории $vf["dir"]["tpls"]
+		 */
+		public function setPath($file){
+			global $vf;
+			$this->path=$vf["dir"]["tpls"]."/".$file;
+		}
+		
+		/**
+		 * Устанавливает путь к файлу шаблона.
+		 * 
+		 * @param string $file Путь к файлу шаблона
+		 */
+		public function setFullPath($file){
+			$this->path=$path;
+		}
+				
 		/**
 		 * Вытаскивает из массива значения для переменых шаблона.
 		 * 
@@ -167,6 +186,7 @@
 		 * @return string Результат выполнения шаблона
 		 */
 		public function compile(){
+			if(!file_exists($this->path)) throw new FormatException("Не указан файл с шаблоном","Нет шаблона");
 			extract($this->vars);
 			ob_start();
 			include($this->path);
