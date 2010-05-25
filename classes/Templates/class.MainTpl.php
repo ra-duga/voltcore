@@ -29,11 +29,16 @@
 			parent::__construct(VCROOT."/Templates/main.tpl",$cache, $dir);
 			$this->css=new CssTpl();
 			$this->js=new JsTpl();
-			$this->baseUrl=URLROOT;
+			$this->baseUrl = defined("URLROOT") ? "<base href='".URLROOT."' />" : "";
 			$this->pageTitle="Главная страница";
 			$this->body="Привет, кто-бы-ты-ни-был!";
 		}
 		
+		/**
+		 * Устанавливает базовый адрес модуля.
+		 * 
+		 * @param string $base Базовый адрес модуля.
+		 */
 		public function setBase($base){
 			$this->baseUrl="<base href='$base' />";
 		}
