@@ -59,6 +59,7 @@
 		 */
 		define("LOGDIR",DOCROOT);
 	}
+	
 	if (!defined("LOG_PREFIX")){
 		/**
 		 * Префикс файлов логов.
@@ -114,8 +115,7 @@
 	$vf["dir"]["tpls"]=DOCROOT."/templates";// Дирректория с файлами шаблонов
 	$vf["dir"]["cache"]=DOCROOT."/cache";	// Дирректория для кэша
 	
-	$vf['dir']['classes'][]=VCROOT."/classes"; // Массив дирректорий в из которых автолоад должен составить список классов.
-	
+	$vf['dir']['classes'][]=VCROOT."/classes";	// Массив дирректорий из которых автолоад должен составить список классов.
 	
 	$vf["tpl"]["needCache"]=false;			// Кшировать ли шаблоны
 		

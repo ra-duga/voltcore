@@ -21,7 +21,7 @@
 	 */
 	function scanFiles($dir, &$allFiles) {
 		if (!is_dir($dir)) return;
-		$cont=glob($dir."/class.*.php");
+		$cont=glob($dir."/*");
 		if(!$cont) return;
 		
 		foreach($cont as $file){
@@ -46,7 +46,7 @@
 	 * 
 	 * @param array $dirs Результирующий массив файлов
 	 */
-	function makeDirs(&$dirs){
+	function makeDirs(){
 		global $vf;
 		$dirs=getFromCache('vfClasses');
 		if (!is_null($dirs)){
@@ -56,7 +56,9 @@
 		foreach($vf['dir']['classes'] as $dir){
 			scanFiles($dir, $dirs);
 		}
-		cacheIt('vfClasses', serialize($dirs));
+		$cDirs=str_replace('\\','/',serialize($dirs));
+		cacheIt('vfClasses', $cDirs);
+		return $dirs;
 	}
  
  	/**
@@ -65,16 +67,16 @@
 	 * @param string $class Имя требуемого класса
 	 */
  	function voltAutoload($class='') {
-		if($class == '') return;
+ 		if($class == '') return;
  		
 		static $dirs = false;
  
 		if(!$dirs) {
-			makeDirs($dirs);
+			$dirs=makeDirs();
 		}
- 
+		
 		$classname = strtolower($class);
-
+		
 		if(isset($dirs[$classname])) {
 			require_once($dirs[$classname]);
 			return;

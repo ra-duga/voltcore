@@ -30,7 +30,7 @@
 			$cssFiles=getCSSFiles();
 			$rightArr=array();
 			foreach($cssFiles as $file){
-				$rightArr[]=str_replace(DOCROOT,"",$file);
+				$rightArr[]=str_replace(SITEROOT,"",$file);
 			}
 			$this->files=$rightArr;
 		}

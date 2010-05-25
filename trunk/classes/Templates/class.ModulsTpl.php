@@ -30,7 +30,7 @@
 			$arrFiles=getPHPFiles();
 			$rightArr=array();
 			foreach($arrFiles as $file){
-				$rightArr[$this->getFileTitle($file)]=str_replace(DOCROOT,"",$file);
+				$rightArr[$this->getFileTitle($file)]=str_replace(SITEROOT,"",$file);
 			}
 			$this->arrModuls=$rightArr;
 		}
