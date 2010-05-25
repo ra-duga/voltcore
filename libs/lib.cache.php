@@ -22,7 +22,7 @@
 		global $vf;
 		$cacheType= $cacheType ? $cacheType : $vf["cache"]["defType"];
 		switch ($cacheType){
-			case "file" : cacheToFile($key, $val);
+			case "file" : cacheToFile($key, $val); break;
 			default: throw new FormatException("Указано неизвестное хранилище.", "Неверные данные");  
 		}
 		
