@@ -29,6 +29,8 @@
 			parent::__construct(VCROOT."/Templates/main.tpl",$cache, $dir);
 			$this->css=new CssTpl();
 			$this->js=new JsTpl();
+			$this->css->setDefault();
+			$this->js->setDefault();
 			$this->baseUrl = defined("URLROOT") ? "<base href='".URLROOT."' />" : "";
 			$this->pageTitle="Главная страница";
 			$this->body="Привет, кто-бы-ты-ни-был!";

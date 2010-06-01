@@ -20,6 +20,13 @@
 	abstract class InclTpl extends Template{
 
 		/**
+		 * Возвращает массив подключаемых файлов.
+		 * 
+		 * @return array Массив подключаемых файлов.
+		 */
+		abstract protected function getFiles();
+		
+		/**
 		 * Конструктор.
 		 * 
 		 * @param String $path Путь к файлу шаблона
@@ -31,8 +38,8 @@
 			$this->files=array();
 		}
 		
-			/**
-		 * Преобразует переданные данные ля добавления в массив.
+		/**
+		 * Преобразует переданные данные для добавления в массив.
 		 * 
 		 * @param mixed $more Строка, массив строк или InclTpl объект, содержащие необходимое дополнение.
 		 * @return array Данные для добавления.
@@ -58,7 +65,7 @@
 		 * 
 		 * Объявление, содержащееся в шаблоне, должно быть строкой или InclTpl объектом. 
 		 * 
-		 * @param mixed $moreCss Строка, массив строк или InclTpl объект, содержащие необходимое дополнение.
+		 * @param mixed $more Строка, массив строк или InclTpl объект, содержащие необходимое дополнение.
 		 * @throws FormatException При неверном типе данных.
 		 */
 		public function add($more){
@@ -82,4 +89,15 @@
 			$this->files=array_merge($addArray, $this->files);
 		}
 		
+		/**
+		 * Ищет файлы в настраиваемой дирректории и создает массив подключаемых файлов. 
+		 */
+		public function setDefault(){
+			$files=$this->getFiles();
+			$rightArr=array();
+			foreach($files as $file){
+				$rightArr[]=str_replace(SITEROOT,"",$file);
+			}
+			$this->files=$rightArr;
+		}
 	}

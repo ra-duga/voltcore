@@ -806,7 +806,7 @@
 		 * @param resource $res Если параметр $res задан, то строка берется из него, в противном случае строка берется из $this->res
 		 * @return array Двумерный массив с результатом запроса.
 		 */
-		public function fetchTable($rez){
+		public function fetchTable($rez=null){
 			if (!$rez){
 				$rez=$this->res;
 			}
@@ -818,7 +818,7 @@
 			
 			return $dataTable;
 		} 
-
+		
 														///////////////////
 														//Перекодирование//
 														///////////////////

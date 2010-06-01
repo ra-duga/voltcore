@@ -52,22 +52,89 @@
 		protected $table;
 
 		/**
+		 * Имя таблицы, в которой содержатся имена узлов.
+		 * @var string
+		 */
+		protected $nameTable;
+		
+		/**
+		 * Имя поля с идентификаторами. 
+		 * @var string
+		 */
+		protected $idField;
+		
+		/**
+		 * Имя поля, в котором содержатся имена узлов.
+		 * @var string
+		 */
+		protected $nameField;
+		
+		
+		/**
 		 * Само дерево.
 		 * @var array
 		 */
 		protected $tree;
+		
+		/**
+		 * Объект для работы с БД
+		 * @var object
+		 */
+		protected $DB;
 	
 		/**
 		 * Конструктор.
 		 * 
 		 * @param string $tab Таблица, в которой лежит дерево.
+		 * @param string $idName Имя поля с идентификаторами.
+		 * @param string $idParName Имя поля с идентификаторами родителей. 
+		 * @param string $nameTab Имя таблицы, в которой содержатся имена узлов. 
+		 * @param string $nameField Имя поля, в котором содержатся имена узлов.
+		 * @param string $DBCon Объект для работы с БД.
 		 */
-		public function __construct($tab){
-			$DB=SQLDBFactory::getDB();
-			$this->table=$DB->escapeKeys($tab);
+		public function __construct($tab, $idName, $nameTab=null, $nameField=null, $DBCon=null){
+			$this->DB=$DBCon ? $DBCon : SQLDBFactory::getDB();
+			$this->table=$this->DB->escapeKeys($tab);
+			$this->idField=$this->DB->escapeKeys($idName);
+			$this->nameTable=$this->DB->escapeKeys($nameTab);
+			$this->nameField=$this->DB->escapeKeys($nameField);
 			$this->tree=null;
 		}
 	
+		/**
+		 * Возвращает запросы для вставки нового листа в дерево.
+		 *
+		 * @param int $idChild Идентификатор того, у кого меняем родителя.
+		 * @param int $idParent Идентификатор нового родителя.
+		 * @return string Запросы для вставки нового листа в дерево.
+		 */
+		abstract protected function getAddInsert($idChild, $idParent);
+
+		/**
+		 * Возвращает запрос для нахождения непосредственного родителя.
+		 *
+		 * @param int $idChild Идентификатор того, у кого меняем родителя.
+		 * @return string Запрос для нахождения непосредственного родителя.
+		 */
+		abstract protected function getSelectParent($idChild);
+		
+		/**
+		 * Выполняет запросы для смены родителя у узла.
+		 * 
+		 * @param int $idChild Идентификатор того, у кого меняем родителя.
+		 * @param int $idParent Идентификатор нового родителя.
+		 * @throws SqlException При ошибке работы с базой.
+		 */
+		abstract protected function doChangePar($idChild, $idParent);
+
+		/**
+		 * Выполняет запросы для удаления поддерева.
+		 * 
+		 * @param int $idChild Идентификатор того, у кого меняем родителя.
+		 * @throws SqlException При ошибке работы с базой.
+		 */
+		abstract protected function doDeleteSubTree($idChild);
+		
 		/**
 		 * Добавляет новый лист в дерево.
 		 *  
@@ -77,9 +144,35 @@
 		 * @throws SqlException При ошибке работы с базой.
 		 * @throws FormatException Если указаны не все поля.
 		 */
-		abstract public function add($id, $parId, $haveNames=DBTree::NO_NAME);
+		public function add($id, $parId, $haveNames=DBTree::NO_NAME){
+			if ($haveNames!=DBTree::NO_NAME && (!$this->nameTable || !$this->nameField)) throw new FormatException("Недостаточно данных.","Указаны не все данные");
+			$this->tree=null;
+			$DB=$this->DB;
+			try{
+				$DB->startTran();
+				$id=$DB->escapeString($id);
+				$parId=$DB->escapeString($parId);
+
+				$idChild=$id;
+				if ($haveNames & DBTree::CHILD_NAME){
+					$idChild=$DB->insert("insert into $this->nameTable($this->nameField) values($id)");
+				}
+				$idParent=$parId;
+				if ($haveNames & DBTree::PARENT_NAME){
+					$idParent=$DB->getVal("select id from $this->nameTable where $this->nameField=$parId");
+				}
+				
+				$insert=$this->getAddInsert($idChild, $idParent);
+				foreach($insert as $query){
+					$DB->insert($query);
+				}
+				$DB->commit();
+			}catch(SqlException $e){
+				$DB->rollback();
+				throw $e;
+			}
+		}
 			
-		/**
 		/**
 		 * Меняет родителя у узла.
 		 * 
@@ -89,7 +182,33 @@
 		 * @throws SqlException При ошибке работы с базой.
 		 * @throws FormatException Если указаны не все поля.
 		 */
-		abstract public function changePar($id, $parId, $haveNames=DBTree::NO_NAME);
+		public function changePar($id, $parId, $haveNames=DBTree::NO_NAME){
+			if ($haveNames!=DBTree::NO_NAME && (!$this->nameTable || !$this->nameField)) throw new FormatException("Недостаточно данных.","Указаны не все данные");
+			$DB=$this->DB;
+			try{
+				$DB->startTran();
+				$id=$DB->escapeString($id);
+				$parId=$DB->escapeString($parId);
+
+				$idChild=$id;
+				if ($haveNames & DBTree::CHILD_NAME){
+					$idChild=$DB->getVal("select id from $this->nameTable where $this->nameField=$id");
+				}
+				$idParent=$parId;
+				if ($haveNames & DBTree::PARENT_NAME){
+					$idParent=$DB->getVal("select id from $this->nameTable where $this->nameField=$parId");
+				}
+			
+				$this->tree=null;
+				$this->doChangePar($idChild, $idParent);
+				$DB->commit();
+			}catch(SqlException $e){
+				$DB->rollback();
+				throw $e;
+			}
+			
+			
+		}
 
 		/**
 		 * Удаляет поддерево.
@@ -99,7 +218,27 @@
 		 * @throws SqlException При ошибке работы с базой.
 		 * @throws FormatException Если указаны не все поля.
 		 */
-		abstract public function deleteSubTree($id, $haveNames=DBTree::NO_NAME);
+		public function deleteSubTree($id, $haveNames=DBTree::NO_NAME){
+			if (!$this->nameTable || !$this->nameField) throw new FormatException("Недостаточно.","Указаны не все данные");
+			
+			$this->tree=null;
+			$DB=SQLDBFactory::getDB();
+			try{
+				$DB->startTran();
+				$id=$DB->escapeString($id);
+
+				$idChild=$id;
+				if ($haveNames & DBTree::CHILD_NAME){
+					$idChild=$DB->getVal("select id from $this->nameTable where $this->nameField=$id");
+				}
+
+				$this->doDeleteSubTree($idChild);
+				$DB->commit();
+			}catch(SqlException $e){
+				$DB->rollback();
+				throw $e;
+			}
+		}
 		
 		
 		/**
@@ -123,7 +262,20 @@
 		 * @param int $haveNames Определяет, считать ли $id именем.
 		 * @return mixed Идентификатор предка.
 		 */
-		abstract public function getParent($id, $haveNames=DBTree::NO_NAME);
+		public function getParent($id, $haveNames=DBTree::NO_NAME){
+			if (!$this->nameTable || !$this->nameField) throw new FormatException("Недостаточно данных.","Указаны не все данные");
+			
+			$DB=$this->DB;
+			$id=$DB->escapeString($id);
+
+			$idChild=$id;
+			if ($haveNames & DBTree::CHILD_NAME){
+				$idChild=$DB->getVal("select id from $this->nameTable where $this->nameField=$id");
+			}
+			$select=$this->getSelectParent($idChild);
+			return $DB->getVal($select);
+			
+		}
 		
 		/**
 		 * Вытаскивает дерево в массив. 
