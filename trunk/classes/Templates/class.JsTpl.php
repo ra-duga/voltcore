@@ -26,13 +26,16 @@
 		 * @param string $dir Дирректория для кэша шаблона.
 		 */
 		public function __construct($cache=null, $dir=null){
-			parent::__construct(VCROOT."/Templates/linkJs.tpl",$cache, $dir);
-			$jsFiles=getJSFiles();
-			$rightArr=array();
-			foreach($jsFiles as $file){
-				$rightArr[]=str_replace(SITEROOT,"",$file);
-			}
-			$this->files=$rightArr;
+			parent::__construct(VCROOT."/Templates/linkJS.tpl",$cache, $dir);
+		}
+		
+		/**
+		 * Возвращает массив подключаемых файлов.
+		 * 
+		 * @return array Массив подключаемых файлов.
+		 */
+		protected function getFiles(){
+			return getJsFiles();
 		}
 	}
 ?>

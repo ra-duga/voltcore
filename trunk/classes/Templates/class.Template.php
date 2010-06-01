@@ -54,7 +54,12 @@
 		 */
 		public function __construct($path=null, $cache=null, $dir=null){
 			global $vf;
-			$this->path=$path;
+			if (strpos($path,SITEROOT)===false && strpos($path,VCROOT)===false){
+				$this->setPath($path);
+			}
+			else{
+				$this->setFullPath($path);
+			}
 			$this->needCache= $cache==null ? $vf["tpl"]["needCache"] : $cache;
 			$this->cacheDir= $dir==null ? $vf["dir"]["cache"] : $dir;
 			
@@ -64,15 +69,12 @@
 		}
 
 		/**
-		 * Мангическое получение значения переменной.
+		 * Магическое получение значения переменной.
 		 * 
 		 * @param string $var Имя переменной
 		 * @return mixed Значение переменной
 		 */
 		public function __get($var){
-			if (isset($this->$var)){
-				return $this->$var;
-			}
 			return $this->vars[$var];
 		}
 		
@@ -102,7 +104,7 @@
 		 * @param string $file Путь к файлу шаблона
 		 */
 		public function setFullPath($file){
-			$this->path=$path;
+			$this->path=$file;
 		}
 				
 		/**
@@ -186,7 +188,7 @@
 		 * @return string Результат выполнения шаблона
 		 */
 		public function compile(){
-			if(!file_exists($this->path)) throw new FormatException("Не указан файл с шаблоном","Нет шаблона");
+			if(!file_exists($this->path)) throw new FormatException("Не указан файл с шаблоном. Указан $this->path","Нет шаблона");
 			extract($this->vars);
 			ob_start();
 			include($this->path);

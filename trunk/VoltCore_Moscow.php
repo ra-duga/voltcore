@@ -19,7 +19,7 @@
 	 * 
 	 * @var string 
 	 */
-	define("VCROOT",dirname(__FILE__));
+	define("VCROOT",str_replace('\\','/',dirname(__FILE__)));
 	
 	/**
 	 * Подключение библиотеки логирования

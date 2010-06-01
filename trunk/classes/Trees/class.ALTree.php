@@ -9,13 +9,11 @@
 	 */
 	
 	/**
-	 * Класс для работы с деревом. Дерево хранится по принципу Full Hierarchy (Redundant Adjacency List по другим источникам). 
+	 * Класс для работы с деревом. Дерево хранится по принципу Adjacency List.
 	 * 
 	 * Данная реализация принципа предполагает:
-	 * 1)Существует корневой элемент с id = 1. 
-	 * 2)В таблице есть три колонки: идентификатор узла, идентификатор родителя, уровень.
-	 * 3)У узла создается запись для каждого родителя с указанием уровня (первый родитель - 1, родитель родителя - 2 и т.д.).
-	 * 4)Узел имеет как минимум 2 записи - ссылка на себя с уровнем 0 и ссылка на корневой элемент с id = 1. 
+	 * 1)Существует корневой элемент. 
+	 * 2)Корневой элемент ссылается на себя как на родителя. 
 	 * 
 	 * @author Костин Алексей Васильевич aka Volt(220)
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
@@ -23,7 +21,7 @@
 	 * @package classes
 	 * @subpackage Trees
 	 */
-	class FHTree extends DBTree{
+	class ALTree extends DBTree{
 
 		/**
 		 * Имя поля с идентификаторами родителей. 
@@ -32,26 +30,18 @@
 		private $idParField;
 	
 		/**
-		 * Имя поля уровня. 
-		 * @var string
-		 */
-		private $levelField;
-	
-		/**
 		 * Конструктор.
 		 * 
 		 * @param string $tab Таблица, в которой лежит дерево.
 		 * @param string $idName Имя поля с идентификаторами.
 		 * @param string $idParName Имя поля с идентификаторами родителей. 
-		 * @param string $levelName Имя поля уровня.
 		 * @param string $nameTab Имя таблицы, в которой содержатся имена узлов. 
 		 * @param string $nameField Имя поля, в котором содержатся имена узлов.
 		 * @param string $DBCon Объект для работы с БД.
 		 */
-		public function __construct($tab, $idName, $idParName, $levelName, $nameTab=null, $nameField=null, $DBCon=null){
+		public function __construct($tab, $idName, $idParName, $nameTab=null, $nameField=null, $DBCon=null){
 			parent::__construct($tab, $idName, $nameTab, $nameField, $DBCon);
 			$this->idParField=$this->DB->escapeKeys($idParName);
-			$this->levelField=$this->DB->escapeKeys($levelName);
 		}
 
 		/**
@@ -80,10 +70,7 @@
 		 * @return string Запросы для вставки нового листа в дерево.
 		 */
 		protected function getAddInsert($idChild, $idParent){
-			return array(	
-				"insert into $this->table($this->idField, $this->idParField, $this->levelField)
-					select $idChild, $this->idParField, $this->levelField+1 from $this->table where $this->idField=$idParent",
-				"insert into $this->table($this->idField, $this->idParField, $this->levelField)	values($idChild, $idChild, 0)");		
+			return array("insert into $this->table($this->idField, $this->idParField) values ($idChild, $idParent)");
 		}
 	
 		/**
@@ -94,27 +81,12 @@
 		 * @throws SqlException При ошибке работы с базой.
 		 */
 		protected function doChangePar($idChild, $idParent){
-			$table=$this->table;
-			$f=$this->idField;
-			$pid=$this->idParField;
-			$level=$this->levelField;
-			$DB=$this->DB;
-			
-			$allChilds="select $f from $table where $pid=$idChild";
-			$allParents="select $pid from $table where $f=$idChild and $pid<>$idChild";
-				
-			$childs="(".implode(",",$DB->getColumn($allChilds)).")";
-			$parents="(".implode(",",$DB->getColumn($allParents)).")";
-				
-			$delete="delete from $table where $f in $childs and $pid in $parents";
-		
 			$insert="insert into $table($f, $pid, $level)
 				SELECT down.$f, up.$pid, down.$level + up.$level + 1
 				FROM $table as up join $table as down on 
 				up.$f = $idParent and down.$pid=$idChild";
 		
-			$DB->delete($delete);
-			$DB->insert($insert);
+				$DB->insert($insert);
 		}
 	
 		/**
@@ -125,15 +97,11 @@
 		 */
 		protected function doDeleteSubTree($idChild){
 			$DB=$this->DB;
-			
-			$allChilds="select $this->idField from $this->table where $this->idParField=$idChild";
-			$childs="(".implode(",",$DB->getColumn($allChilds)).")";
-				
-			$deleteName="delete from $this->nameTable where id in $childs";
-			$delete="delete from $this->table where $this->idField in $childs";
-				
-			$DB->delete($delete);
-			$DB->delete($deleteName);
+			$DB->delete("delete from $this->table where $this->idField=$idChild or $this->idParField=$idChild");
+			while ($DB->affectRows()>0){
+				$DB->delete("delete from $this->nameTable where id not in (select $this->idField from $this->table)");
+				$DB->delete("delete from $this->table where $this->idParField not in (select id from $this->nameTable)");
+			}
 		}
 		
 		/**
@@ -143,15 +111,14 @@
 		 * @return string Запрос для нахождения непосредственного родителя.
 		 */
 		protected function getSelectParent($idChild){
-			return "select $this->idParField from $this->table where $this->idField=$idChild and $this->levelField=1";
+			return "select $this->idParField from $this->table where $this->idField=$idChild";
 		}
 		
 	
 		/**
 		 * Вытаскивает дерево из БД и создает соответствующий массив. 
 		 * 
-		 * Запрос построен таким образом, что родитель узла в очередной строке находится в строке, которая уже обработана.
-		 * 
+		 * @todo Реализовать выбор поддерева.
 		 * @param mixed $id Идентификатор корня поддерева. Если не указан, то возвращается все дерево.
 		 * @return array Массив с деревом. 
 		 * 		Индексами этого массива является порядковый номер узла в уровне, начиная с 0, без пропусков.
@@ -168,21 +135,15 @@
 			$tree=$this->table;
 			$f=$this->idField;
 			$pid=$this->idParField;
-			$level=$this->levelField;
 			$name=$this->nameField;
 			$tab=$this->nameTable;
 		
 			//Выбор
-			$sql="	select c.id as cid, c.$name as cname, par.id as pid
-					from 
-						$tree as t 
-						join $tab as c on t.$f=c.id
-						left outer join $tree as t2 on t.$f=t2.$f and t2.$level=1
-						left outer join $tab as par on par.id=t2.$pid
-					where t.$pid=$id
-					order by t.$level, c.$name";
-
-			$DB=SQLDBFactory::getDB();
+			$sql="select c.id as cid, c.$name as cname, par.id as pid
+			    from $tree as t join $tab as c on t.$f=c.id
+			    order by c.$name";
+			
+			$DB=$this->DB;
 			$DB->select($sql);
 			
 			//Запись в массив
@@ -191,13 +152,19 @@
 				if(!isset($path[$row["cid"]])){
 					$path[$row["cid"]]=array("name"=>$row["cname"], "id"=>$row["cid"], "tree"=>array());
 				}
-				if($row["pid"]){
+				else{
+					$path[$row["cid"]]["name"]=$row["cname"];
+					$path[$row["cid"]]["id"]=$row["cid"];
+				}
+				if ($row["pid"]!=$row["cid"]){
 					$path[$row["pid"]]["tree"][]=&$path[$row["cid"]];
+				}
+				else{
+					$root=$row["cid"];
 				}
 			}
 			$tree=array();
-			reset($path);
-			$tree[0]=$path[key($path)];
+			$tree[0]=$path[$root];
 			return $tree;
 		}
 	}

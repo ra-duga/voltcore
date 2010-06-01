@@ -13,7 +13,7 @@
 	 * Класс работы с СУБД Microsoft SQL Server
 	 * 
 	 * Класс предназначен для работы с СУБД Microsoft SQL Server. 
-	 * Использует ODBC функции.
+	 * Использует odbtp функции.
 	 * Проверялось на MS SQL Server 2005.
 	 * 
 	 * @author Костин Алексей Васильевич aka Volt(220)
