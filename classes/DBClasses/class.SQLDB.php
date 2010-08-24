@@ -582,7 +582,7 @@
 		 */
 		public function getSelect($arr, $tab=null, $where=null, $numUnion=0){
 			if (is_array($arr)){
-				if (empty($tab)  || !is_string($tab)) throw new FormatException("Не задана таблица для вставки строки","Неверный тип данных");
+				if (empty($tab)  || !is_string($tab)) throw new FormatException("Не задана таблица для выбора","Неверный тип данных");
 				
 				$fields="";
 				foreach($arr as $val){
@@ -699,7 +699,7 @@
 		 * или массив где ключи массива трактуются как поля таблицы, а соответствующие значения как значения этих полей
 		 * @return string Сформированное условие.
 		 */
-		protected function getWhere($where){
+		public function getWhere($where){
 				if (is_array($where)) return " where ".$this->getAssignmentString($where, " and");
 				if (is_int($where)) return " where id=".$where;
 				if (!empty($where)) return " where ".$where;
@@ -797,6 +797,7 @@
 		 * @return string имя поля заключенное в спецсимволы
 		 */
 		public function escapeKeys($key){
+			if ($key==="*") return "*";
 			return $this->LKS.$key.$this->RKS;
 		}
 		

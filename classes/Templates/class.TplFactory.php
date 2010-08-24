@@ -22,31 +22,73 @@
 	abstract class TplFactory{   
 
 		/**
-		 * Возвращает шаблон по умолчанию.
-		 * 
-		 * @return object Шаблон по умолчанию.
+		 * Текущий шаблон.
+		 * @var Template
 		 */
-		abstract public function getIndex();
+		protected $tpl;
+		
+		/**
+		 * Страница по-умолчанию
+		 * @var string
+		 */
+		protected $defaultPage='index';
 
+		/**
+		 * Шаблон по-умолчанию
+		 * @var string
+		 */
+		protected $defaultTpl='index';
+		
 		/**
 		 * Логирует запрос несуществующего шаблона.
 		 * 
 		 * @param $mes Запрошенный шаблон
 		 */
 		abstract protected function logErrorCall($mes);
+
+		/**
+		 * Перехват вызова несуществующего метода.
+		 * 
+		 * Такая ситуация может возникнуть, если пользователь попытается сам вбить название
+		 * страницы или шаблона в адресной строке.
+		 * В классе-потомке обязательно должны присутствовать методы для обработки страниц и шаблонов по-умолчанию,
+		 * иначе произойдет зацикливание.
+		 *  
+		 * @param string $n Название метода.
+		 * @param array $a Аргументы.
+		 */
+		public function __call($n, $a){
+			$this->logErrorCall($n);
+			if (strpos($n, 'prepare')===0){
+				$this->callTpl();
+				return;
+			}
+			else{
+				return $this->callInfo();			
+			}
+		}
 		
 		/**
-		 * Магическое получение шаблона.
+		 * Вощзвращает запрошенный шаблон
 		 * 
-		 * @param string $var Имя переменной
-		 * @return mixed Значение переменной
+		 * @param string $chto Корень имени метода, который должен создать и заполнить шаблон.
 		 */
-		public function __get($var){
-			$method='get'.ucfirst($var);
-			if (method_exists($this,$method)){
-				return $this->$method();
-			}
-			$this->logErrorCall($var);
-			return $this->getIndexTpl();
-		}
+		protected function callInfo($chto=null){
+			$chto=$chto ? $chto : $this->defaultPage;
+			$method="set".ucfirst($chto)."Info";
+			return $this->$method();
+			
+		}	
+
+		/**
+		 * Вызывает подготовку шаблона.
+		 * 
+		 * @param string $chto какой шаблон подготовить
+		 */
+		protected function callTpl($chto=null){
+			$chto=$chto ? $chto : $this->defaultTpl;
+			$method="prepare".ucfirst($chto)."Tpl";
+			return $this->$method();
+		}	
+		
 	}
