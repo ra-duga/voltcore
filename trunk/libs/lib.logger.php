@@ -116,7 +116,9 @@
 	 * @param array $maspar Дополнительные данные которые надо приписать к сообщению.
 	 */
 	function logVar($name, $var, $type='debug', $masPar=null){
-		$msg=var_export($var, true);
+		ob_start();
+			var_dump($var);
+		$msg=ob_get_clean();
 		logMsg($name." => ".$msg, $type, 'var', $masPar);
 	}
 ?>

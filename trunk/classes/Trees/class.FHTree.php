@@ -152,6 +152,8 @@
 		 * 
 		 * Запрос построен таким образом, что родитель узла в очередной строке находится в строке, которая уже обработана.
 		 * 
+		 * @param string $sortField Имя поля по которому сортировать дерево. 
+		 * @param array $dopFields дополнительные поля из таблицы с именем.
 		 * @param mixed $id Идентификатор корня поддерева. Если не указан, то возвращается все дерево.
 		 * @return array Массив с деревом. 
 		 * 		Индексами этого массива является порядковый номер узла в уровне, начиная с 0, без пропусков.
@@ -161,9 +163,10 @@
 		 * 			tree – список дочерних узлов для этого узла. Если у этого узла нет дочерних узлов, то здесь содержится пустой массив.
 		 * @throws FormatException Если указаны не все поля.
 		 */
-		public function cultivateTree($id=1){
+		public function cultivateTree($sortField=null,  $dopFields=null, $id=1){
 			if (!$this->nameTable || !$this->nameField) throw new FormatException("Недостаточно данных для создания дерева.","Указаны не все данные");
-		
+			$sFiled= $sortField ? "c.$sortField," : '';
+			$dop= $this->getDopFields($dopFields);
 			//Переприсваивание для создания более читаемого запроса
 			$tree=$this->table;
 			$f=$this->idField;
@@ -173,14 +176,14 @@
 			$tab=$this->nameTable;
 		
 			//Выбор
-			$sql="	select c.id as cid, c.$name as cname, par.id as pid
+			$sql="	select c.id as cid, c.$name as cname, par.id as pid $dop
 					from 
 						$tree as t 
 						join $tab as c on t.$f=c.id
 						left outer join $tree as t2 on t.$f=t2.$f and t2.$level=1
 						left outer join $tab as par on par.id=t2.$pid
 					where t.$pid=$id
-					order by t.$level, c.$name";
+					order by t.$level, $sFiled c.$name";
 
 			$DB=SQLDBFactory::getDB();
 			$DB->select($sql);
@@ -190,14 +193,21 @@
 			while($row=$DB->fetchAssoc()){
 				if(!isset($path[$row["cid"]])){
 					$path[$row["cid"]]=array("name"=>$row["cname"], "id"=>$row["cid"], "tree"=>array());
+					if ($dop){
+						foreach($dopFields as $k=>$v){
+							$path[$row["cid"]][$k]=$row[$k];
+						}
+					}
 				}
 				if($row["pid"]){
 					$path[$row["pid"]]["tree"][]=&$path[$row["cid"]];
 				}
 			}
 			$tree=array();
-			reset($path);
-			$tree[0]=$path[key($path)];
+			if ($path){
+				reset($path);
+				$tree[0]=$path[key($path)];
+			}
 			return $tree;
 		}
 	}

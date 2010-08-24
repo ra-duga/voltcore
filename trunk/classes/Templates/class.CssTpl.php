@@ -35,8 +35,106 @@
 		 * @return array Массив подключаемых файлов.
 		 */
 		protected function getFiles(){
-			return getCSSFiles();
+			$arr=getCSSFiles();
+			foreach ($arr as $file){
+				$cssArr[$i]['title']=$file;
+				$cssArr[$i]['media']='all';
+				$i++;
+			}
+			return $cssArr;
 		}
+		
+		/**
+		 * Ищет файлы в настраиваемой дирректории и создает массив подключаемых файлов. 
+		 */
+		public function setDefault(){
+			$files=getCSSFiles();
+			$cssArr=array();
+			$i=0;
+			foreach($files as $file){
+				$cssArr[$i]['title']=str_replace(SITEROOT,"",$file);
+				$cssArr[$i]['media']='all';
+				$i++;
+			}
+			$this->files=$cssArr;
+		}
+		
+		/**
+		 * Добавляет подключение файлов.
+		 * 
+		 * Объявление, содержащееся в шаблоне, должно быть строкой или InclTpl объектом. 
+		 * 
+		 * @param mixed $more Строка, массив строк или InclTpl объект, содержащие необходимое дополнение.
+		 * @param string $media Для каких устройств действует css 
+		 * @throws FormatException При неверном типе данных.
+		 */
+		public function addCss($more, $media='all'){
+			$addArray=$this->getAddArr($more);
+			$rezArr=array();
+			foreach($addArray as $key=>$file){
+				if (is_string($file)){
+					$rezArr[$key]['title']=$file;
+					$rezArr[$key]['media']=$media;
+				}
+				else{
+					$rezArr[$key]=$title;
+				}
+			}
+			$this->files=array_merge($this->files, $rezArr);
+		}
+		
+		/**
+		 * Добавляет подключение файлов.
+		 * 
+		 * Объявление, содержащееся в шаблоне, должно быть строкой или InclTpl объектом.
+		 * Объявления добовляются в начало.
+		 * 
+		 * @param mixed $moreCss Строка, массив строк или InclTpl объект, содержащие необходимое дополнение.
+		 * @param string $media Для каких устройств действует css 
+		 * @throws FormatException При неверном типе данных.
+		 */
+		public function addBeforeCss($more, $media='all'){
+			$addArray=$this->getAddArr($more);
+			$rezArr=array();
+			foreach($addArray as $key=>$file){
+				if (is_string($file)){
+					$rezArr[$key]['title']=$file;
+					$rezArr[$key]['media']=$media;
+				}
+				else{
+					$rezArr[$key]=$title;
+				}
+			}
+			$this->files=array_merge($rezArr, $this->files);
+		}
+		
+				/**
+		 * Добавляет подключение файлов.
+		 * 
+		 * Объявление, содержащееся в шаблоне, должно быть строкой или InclTpl объектом. 
+		 * 
+		 * @param mixed $more Строка, массив строк или InclTpl объект, содержащие необходимое дополнение.
+		 * @throws FormatException При неверном типе данных.
+		 */
+		public function add($more){
+			$this->addCss($more);
+		}
+		
+		/**
+		 * Добавляет подключение файлов.
+		 * 
+		 * Объявление, содержащееся в шаблоне, должно быть строкой или InclTpl объектом.
+		 * Объявления добовляются в начало.
+		 * 
+		 * @param mixed $moreCss Строка, массив строк или InclTpl объект, содержащие необходимое дополнение.
+		 * @throws FormatException При неверном типе данных.
+		 */
+		public function addBefore($more){
+			$this->addBeforeCss($more);
+		}
+		
+		
+		
 		
 	}
 ?>

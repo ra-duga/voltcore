@@ -45,7 +45,7 @@
 		 * @return array Данные для добавления.
 		 * @throws FormatException При неверном типе данных.
 		 */
-		private function getAddArr($more){
+		protected function getAddArr($more){
 			$addArray=array();
 			if (is_string($more)){
 				return explode(PHP_EOL, $more);

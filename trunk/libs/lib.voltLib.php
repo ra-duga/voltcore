@@ -46,4 +46,52 @@
 			}
 		}
 	}
+	
+	/**
+	 * Разбирает bb коды и заменяет их на html.
+	 * 
+	 * @param string $string Строка с кодами.
+	 * @return string Требуемый HTML 
+	 */
+	function parseBBCode($string){
+		$string=nl2br($string);
+		while (preg_match_all('#\[(.+?)=?(.*?)\](.+?)\[/\1\]#um', $string, $matches)){
+			foreach ($matches[0] as $key => $match) { 
+				list($tag, $param, $innertext) = array($matches[1][$key], $matches[2][$key], $matches[3][$key]); 
+            	switch ($tag) { 
+                	case 'b': $replacement = "<strong>$innertext</strong>"; break; 
+                	case 'i': $replacement = "<em>$innertext</em>"; break; 
+                	case 's': $replacement = "<span class=\"strike\">$innertext</span>"; break; 
+                	case 'u': $replacement = "<span class=\"underline\">$innertext</span>"; break; 
+            	} 
+            	$string = str_replace($match, $replacement, $string); 
+        	} 
+        }
+        return $string; 
+	}
+	
+	/**
+	 * Генерирует пароль.
+	 * 
+	 * @param int $num Количество символов в пароле. (Не более 248)
+	 * @return string Новый пароль 
+	 */
+	function newPass($num){
+		$s="qwertyuiopasdfghjklzxcvbnm";
+		$s .=strtoupper($s);
+		$s .="0123456789";
+		$s .=$s.$s.$s;
+		$s=str_shuffle($s);
+		return substr($s,0,$num);
+	}
+	
+	/**
+	 * Удаляет файл, если тот существует.
+	 * @param string $file Путь к файлу.
+	 */
+	function smartUnlink($file){
+		if(file_exists($file)){
+			unlink($file);
+		}
+	}
 ?>
