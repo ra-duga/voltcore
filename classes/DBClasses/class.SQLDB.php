@@ -472,8 +472,12 @@
 		 * Возвращает первую строку из результата запроса $sql в виде ассоциативного массива. 
 		 * 
 		 * @throws SqlException, FormatException
-		 * @param string $sql Запрос для выполнения
-		 * @param int $numUnion Количество операторов union в запросе
+		 * @param mixed $arr Если $arr массив, то он должен содержать поля для выбора.
+		 * Если $arr это строка, то она трактуется как sql-запрос для выполнения.  
+		 * @param string $tab Таблица, в которой выполняется обновление.
+		 * @param mixed $where Условие, по которому происходит поиск, или id записи для поиска, 
+		 * или массив где ключи массива трактуются как поля таблицы, а соответствующие значения как значения этих полей
+		 * @param int $numUnion Количество операторов union в запросе.
 		 * @return array Ассоциативный массив, содержащий значения из первой строки результата запроса
 		 */
 		public function getAssoc($arr, $tab=null, $where=null, $numUnion=0){
@@ -485,8 +489,12 @@
 		 * Возвращает первую строку из результата запроса $sql в виде пронумированного массива. 
 		 * 
 		 * @throws SqlException, FormatException
-		 * @param string $sql Запрос для выполнения
-		 * @param int $numUnion Количество операторов union в запросе
+		 * @param mixed $arr Если $arr массив, то он должен содержать поля для выбора.
+		 * Если $arr это строка, то она трактуется как sql-запрос для выполнения.  
+		 * @param string $tab Таблица, в которой выполняется обновление.
+		 * @param mixed $where Условие, по которому происходит поиск, или id записи для поиска, 
+		 * или массив где ключи массива трактуются как поля таблицы, а соответствующие значения как значения этих полей
+		 * @param int $numUnion Количество операторов union в запросе.
 		 * @return array Пронумированный массив, содержащий значения из первой строки результата запроса
 		 */
 		public function getRow($arr, $tab=null, $where=null, $numUnion=0){
@@ -498,8 +506,12 @@
 		 * Возвращает первый столбец из результата запроса $sql в виде пронумированного массива. 
 		 * 
 		 * @throws SqlException, FormatException
-		 * @param string $sql Запрос для выполнения
-		 * @param int $numUnion Количество операторов union в запросе
+		 * @param mixed $arr Если $arr массив, то он должен содержать поля для выбора.
+		 * Если $arr это строка, то она трактуется как sql-запрос для выполнения.  
+		 * @param string $tab Таблица, в которой выполняется обновление.
+		 * @param mixed $where Условие, по которому происходит поиск, или id записи для поиска, 
+		 * или массив где ключи массива трактуются как поля таблицы, а соответствующие значения как значения этих полей
+		 * @param int $numUnion Количество операторов union в запросе.
 		 * @return array Пронумированный массив, содержащий значения из первого столбца результата запроса
 		 */
 		public function getColumn($arr, $tab=null, $where=null, $numUnion=0){
@@ -515,8 +527,12 @@
 		 * Возвращает первую строку из результата запроса $sql в виде объекта 
 		 * 
 		 * @throws SqlException, FormatException
-		 * @param string $sql Запрос для выполнения
-		 * @param int $numUnion Количество операторов union в запросе
+		 * @param mixed $arr Если $arr массив, то он должен содержать поля для выбора.
+		 * Если $arr это строка, то она трактуется как sql-запрос для выполнения.  
+		 * @param string $tab Таблица, в которой выполняется обновление.
+		 * @param mixed $where Условие, по которому происходит поиск, или id записи для поиска, 
+		 * или массив где ключи массива трактуются как поля таблицы, а соответствующие значения как значения этих полей
+		 * @param int $numUnion Количество операторов union в запросе.
 		 * @return object Объект, содержащий значения из первой строки результата запроса
 		 */
 		public function getObj($arr, $tab=null, $where=null, $numUnion=0){
@@ -528,8 +544,12 @@
 		 * Возвращает единственное значение из результата запроса $sql. 
 		 * 
 		 * @throws SqlException, FormatException
-		 * @param string $sql Запрос для выполнения
-		 * @param int $numUnion Количество операторов union в запросе
+		 * @param mixed $arr Если $arr массив, то он должен содержать поля для выбора.
+		 * Если $arr это строка, то она трактуется как sql-запрос для выполнения.  
+		 * @param string $tab Таблица, в которой выполняется обновление.
+		 * @param mixed $where Условие, по которому происходит поиск, или id записи для поиска, 
+		 * или массив где ключи массива трактуются как поля таблицы, а соответствующие значения как значения этих полей
+		 * @param int $numUnion Количество операторов union в запросе.
 		 * @return mixed Значение из первой строки результата запроса
 		 */
 		public function getVal($arr, $tab=null, $where=null, $numUnion=0){
@@ -541,12 +561,16 @@
 		 * Возвращает весь результат запроса в виде двумерного массива. 
 		 * 
 		 * @throws SqlException, FormatException
-		 * @param string $sql Запрос для выполнения
-		 * @param int $numUnion Количество операторов union в запросе
+		 * @param mixed $arr Если $arr массив, то он должен содержать поля для выбора.
+		 * Если $arr это строка, то она трактуется как sql-запрос для выполнения.  
+		 * @param string $tab Таблица, в которой выполняется обновление.
+		 * @param mixed $where Условие, по которому происходит поиск, или id записи для поиска, 
+		 * или массив где ключи массива трактуются как поля таблицы, а соответствующие значения как значения этих полей
+		 * @param int $numUnion Количество операторов union в запросе.
 		 * @return array Двумерный массив с результатом запроса.
 		 */
-		public function getTable($sql,$numUnion=0){
-			$this->select($sql,$numUnion);
+		public function getTable($arr, $tab=null, $where=null, $numUnion=0){
+			$this->select($arr, $tab, $where, $numUnion);
 			return $this->fetchTable();
 		}
 		
@@ -657,7 +681,7 @@
 
 				$expr=$this->getWhere($where);
 								
-				$sql="update $tab set".$sets.$expr; //Создаем запрос
+				$sql="update $tab set ".$sets.$expr; //Создаем запрос
 			}
 			else{
 				$sql=trim($arr."");
@@ -782,7 +806,7 @@
 				}
 				return $str;
 			}
-			if ($str==null) return "NULL";
+			if (is_null($str)) return "NULL";
 			if (is_string($str)) return "'".$this->escape($str)."'";
 			return $str;
 		}
