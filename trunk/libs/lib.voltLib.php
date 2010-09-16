@@ -94,4 +94,18 @@
 			unlink($file);
 		}
 	}
+	
+	/**
+	 * Создает timestamp из даты формата d.m.Y H:i:s
+	 * 
+	 * @param string $date Дата формата d.m.Y H:i:s
+	 */
+	function timestampFromDate($date){
+		$fullDate=$date;
+		if (strlen($date)<12){
+			$fullDate=$date." 00:00:00";
+		}
+		preg_match("#(\d{1,2}).(\d{1,2}).(\d{4})\s(\d{1,2}).(\d{1,2}).(\d{1,2})#", $fullDate, $matches);
+		return mktime($matches[6],$matches[5],$matches[4], $matches[2], $matches[1], $matches[3]);
+	} 
 ?>
