@@ -110,15 +110,18 @@
 	 * Файл находится в директории $vf["log"]["dir"]. В случае отсутствия файла - файл создается.
 	 * Сообщение записывается в виде $name." => ".var_export($var)."|".$type."|".$maspar."|".date("d-m-Y H:i:s").PHP_EOL. 
 	 * 
-	 * @param string $var Имя переменной
+	 * @param string $name Имя переменной
 	 * @param mixed $var Переменная для логирования
+	 * @param bool $return Нужно вернуть результат(true) или залогировать(false).
 	 * @param string $type Тип сообщения.
 	 * @param array $maspar Дополнительные данные которые надо приписать к сообщению.
+	 * @return string Если $return=true, то возвращается строка вида $name." => ".var_dump($var);
 	 */
-	function logVar($name, $var, $type='debug', $masPar=null){
+	function logVar($name, $var, $return=false, $type='debug', $masPar=null){
 		ob_start();
 			var_dump($var);
 		$msg=ob_get_clean();
-		logMsg($name." => ".$msg, $type, 'var', $masPar);
+		if ($return) return $name." => ".$msg;
+		else logMsg($name." => ".$msg, $type, 'var', $masPar);
 	}
 ?>

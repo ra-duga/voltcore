@@ -50,7 +50,6 @@
 		 * @param string $type Тип исключения
 		 * @param int $code Код и исключения
 		 * @param Exception $previous Исключение вызвавшее текущее исключени
-		 * @return VoltException Экземпляр класса
 		 */
 		public function __construct($mes, $type, $code=0, Exception $previous = NULL){
 			global $vf;

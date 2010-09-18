@@ -99,6 +99,8 @@
 	$vf["log"]["log"]=LOGDIR.LOG_PREFIX."runtime.log";			// Файл сообщений(ошибок) возникших в ходе выполнения программы
 	$vf["log"]["mailLog"]=LOGDIR.LOG_PREFIX."mail.log";			// Файл сообщений(ошибок) возникших при работе с почтой
 	$vf["log"]["excLog"]=LOGDIR.LOG_PREFIX."exceptions.log";	// Файл сообщений(ошибок) о возникших исключениях
+	$vf["log"]["formatExcLog"]=LOGDIR.LOG_PREFIX."exceptions.log";	// Файл сообщений(ошибок) о возникших FormatException исключениях
+	$vf["log"]["testExcLog"]=LOGDIR.LOG_PREFIX."exceptions.log";	// Файл сообщений(ошибок) о возникших TestException исключениях
 	$vf["log"]["debug"]=LOGDIR.LOG_PREFIX."debug.log";			// Файл отладочной информации
 	$vf["log"]["var"]=DOCROOT."/var.log";						// Файл с залогированными переменными 
 	
@@ -106,6 +108,7 @@
 	$vf["exc"]["excLog"]=true;				// Логировать ли исключения
 	$vf["exc"]["sqlExcLog"]=true;			// Логировать ли SqlException
 	$vf["exc"]["formatExcLog"]=true;		// Логировать ли FormatException
+	$vf["exc"]["testExcLog"]=false;			// Логировать ли TestException
 	$vf["exc"]["voltExcLog"]=true;			// Логировать ли VoltException
 	
 	//Стандартные дирректории
@@ -120,6 +123,8 @@
 	$vf["tpl"]["needCache"]=false;			// Кшировать ли шаблоны
 		
 	$vf["cache"]["defType"]="file";			// Куда кэшировать по умолчанию. (file)
+	
+	$vf["test"]["db"]="VoltCore_Test";		//Имя базы данных для самотестирования.
 	
 	set_error_handler('errors');
 	

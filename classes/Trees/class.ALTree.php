@@ -12,12 +12,9 @@
 	 * Класс для работы с деревом. Дерево хранится по принципу Adjacency List.
 	 * 
 	 * Данная реализация принципа предполагает:
-	 * 1)Существует корневой элемент. 
+	 * 1)Существует корневой элемент с id=1. 
 	 * 2)Корневой элемент ссылается на себя как на родителя. 
 	 * 
-	 * @author Костин Алексей Васильевич aka Volt(220)
-	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
-	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
 	 * @package classes
 	 * @subpackage Trees
 	 */
@@ -30,122 +27,67 @@
 		private $idParField;
 	
 		/**
-		 * Конструктор.
-		 * 
-		 * @param string $tab Таблица, в которой лежит дерево.
-		 * @param string $idName Имя поля с идентификаторами.
 		 * @param string $idParName Имя поля с идентификаторами родителей. 
-		 * @param string $nameTab Имя таблицы, в которой содержатся имена узлов. 
-		 * @param string $nameField Имя поля, в котором содержатся имена узлов.
-		 * @param string $DBCon Объект для работы с БД.
 		 */
-		public function __construct($tab, $idName, $idParName, $nameTab=null, $nameField=null, $DBCon=null){
-			parent::__construct($tab, $idName, $nameTab, $nameField, $DBCon);
+		public function __construct($tab, $idName, $idParName, $nameTab=null, $idNameField='id', $nameField=null, $orderField=null, $DBCon=null){
+			parent::__construct($tab, $idName, $nameTab, $idNameField, $nameField, $orderField, $DBCon);
 			$this->idParField=$this->DB->escapeKeys($idParName);
 		}
 
-		/**
-		 * Устанавливает имя таблицы, в которой содержатся имена узлов.
-		 * 
-		 * @param string $name Имя таблицы, в которой содержатся имена узлов.
-		 */
-		public function setNameTable($name){
-			$this->nameTable=$name;
+		protected function getChildsQuery($idParent){
+			return "select $this->idField from $this->table where $this->idParField=$idParent";
+		}		
+
+		protected function getFamilyNextNum($idParent){
+			$sorder=$this->orderField;
+			$table=$this->nameTable;
+			$tree=$this->table;
+			$id=$this->idNameField;
+			$idChild=$this->idField;
+			$idPar=$this->idParField;
+			$level=$this->levelField;
+			
+			$num=$this->DB->getVal("select max($sorder) from $table join $tree on $table.$id=$tree.$idChild where $idPar=$idParent");
+			return $num+1;
 		}
-	
-		/**
-		 * Устанавливает имя поля, в котором содержатся имена узлов.
-		 * 
-		 * @param string $name Имя поля, в котором содержатся имена узлов.
-		 */
-		public function setNameField($name){
-			$this->nameField=$name;
-		}
-	
-		/**
-		 * Возвращает запросы для вставки нового листа в дерево.
-		 *
-		 * @param int $idChild Идентификатор того, у кого меняем родителя.
-		 * @param int $idParent Идентификатор нового родителя.
-		 * @return string Запросы для вставки нового листа в дерево.
-		 */
+		
 		protected function getAddInsert($idChild, $idParent){
 			return array("insert into $this->table($this->idField, $this->idParField) values ($idChild, $idParent)");
 		}
-	
-		/**
-		 * Выполняет запросы для смены родителя у узла.
-		 * 
-		 * @param int $idChild Идентификатор того, у кого меняем родителя.
-		 * @param int $idParent Идентификатор нового родителя.
-		 * @throws SqlException При ошибке работы с базой.
-		 */
-		protected function doChangePar($idChild, $idParent){
-			$insert="insert into $table($f, $pid, $level)
-				SELECT down.$f, up.$pid, down.$level + up.$level + 1
-				FROM $table as up join $table as down on 
-				up.$f = $idParent and down.$pid=$idChild";
 		
-				$DB->insert($insert);
+		protected function getSelectParent($idChild){
+			return "select $this->idParField from $this->table where $this->idField=$idChild";
+		}
+				
+		protected function doChangePar($idChild, $idParent){
+			$DB->update("update $this->table set $this->idParField=$idParent where $thisidField=$idChild");
 		}
 	
-		/**
-		 * Выполняет запросы для удаления поддерева.
-		 * 
-		 * @param int $idChild Идентификатор того, у кого меняем родителя.
-		 * @throws SqlException При ошибке работы с базой.
-		 */
 		protected function doDeleteSubTree($idChild){
 			$DB=$this->DB;
 			$DB->delete("delete from $this->table where $this->idField=$idChild or $this->idParField=$idChild");
 			while ($DB->affectRows()>0){
-				$DB->delete("delete from $this->nameTable where id not in (select $this->idField from $this->table)");
-				$DB->delete("delete from $this->table where $this->idParField not in (select id from $this->nameTable)");
+				$DB->delete("delete from $this->nameTable where $this->idNameField not in (select $this->idField from $this->table)");
+				$DB->delete("delete from $this->table where $this->idParField not in (select $this->idNameField from $this->nameTable)");
 			}
 		}
 		
-		/**
-		 * Возвращает запрос для нахождения непосредственного родителя.
-		 *
-		 * @param int $idChild Идентификатор того, у кого меняем родителя.
-		 * @return string Запрос для нахождения непосредственного родителя.
-		 */
-		protected function getSelectParent($idChild){
-			return "select $this->idParField from $this->table where $this->idField=$idChild";
-		}
-		
-	
-		/**
-		 * Вытаскивает дерево из БД и создает соответствующий массив. 
-		 * 
-		 * @todo Реализовать выбор поддерева.
-		 * @param string $sortField Имя поля по которому сортировать дерево. 
-		 * @param array $dopFields дополнительные поля из таблицы с именем.
-		 * @param mixed $id Идентификатор корня поддерева. Если не указан, то возвращается все дерево.
-		 * @return array Массив с деревом. 
-		 * 		Индексами этого массива является порядковый номер узла в уровне, начиная с 0, без пропусков.
-		 * 		Узел – это массив, в которм содержатся следующие элементы:
-		 * 			id – идентификатор узла дерева
-		 * 			name – название узла дерева
-		 * 			tree – список дочерних узлов для этого узла. Если у этого узла нет дочерних узлов, то здесь содержится пустой массив.
-		 * @throws FormatException Если указаны не все поля.
-		 */
-		public function cultivateTree($sortField=null, $dopFields=null, $id=1){
+		public function getTree($extraFields=null, $subTreeRoot=1){
 			if (!$this->nameTable || !$this->nameField) throw new FormatException("Недостаточно данных для создания дерева.","Указаны не все данные");
-			$sFiled= $sortField ? "c.$sortField," : '';
-			$dop= $this->getDopFields($dopFields);
-						
-			
+			$sFiled= $this->orderField ? "c.$this->orderField," : '';
+			$extra= $this->extraFieldsToQueryString($extraFields);
+									
 			//Переприсваивание для создания более читаемого запроса
 			$tree=$this->table;
 			$f=$this->idField;
+			$id=$this->idNameField;
 			$pid=$this->idParField;
 			$name=$this->nameField;
 			$tab=$this->nameTable;
 			
 			//Выбор
-			$sql="select c.id as cid, c.$name as cname, t.id_par as pid $dop
-			    from $tree as t join $tab as c on t.$f=c.id
+			$sql="select c.$id as cid, c.$name as cname, t.$pid as pid $dop
+			    from $tree as t join $tab as c on t.$f=c.$id
 			    order by $sFiled c.$name";
 			
 			$DB=$this->DB;
@@ -156,8 +98,8 @@
 			while($row=$DB->fetchAssoc()){
 				if(!isset($path[$row["cid"]])){
 					$path[$row["cid"]]=array("name"=>$row["cname"], "id"=>$row["cid"], "tree"=>array());
-					if ($dop){
-						foreach($dopFields as $k=>$v){
+					if ($extra){
+						foreach($extraFields as $k=>$v){
 							$path[$row["cid"]][$k]=$row[$k];
 						}
 					}
@@ -165,8 +107,8 @@
 				else{
 					$path[$row["cid"]]["name"]=$row["cname"];
 					$path[$row["cid"]]["id"]=$row["cid"];
-					if ($dop){
-						foreach($dopFields as $k=>$v){
+					if ($extra){
+						foreach($extraFields as $k=>$v){
 							$path[$row["cid"]][$k]=$row[$k];
 						}
 					}
@@ -174,13 +116,10 @@
 				if ($row["pid"]!=$row["cid"]){
 					$path[$row["pid"]]["tree"][]=&$path[$row["cid"]];
 				}
-				else{
-					$root=$row["cid"];
-				}
 			}
 			$tree=array();
-			if ($path){
-				$tree[0]=$path[$root];
+			if ($path && isset($path[$subTreeRoot])){
+				$tree[0]=$path[$subTreeRoot];
 			}
 			return $tree;
 		}
