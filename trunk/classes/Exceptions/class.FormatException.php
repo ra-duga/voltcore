@@ -27,7 +27,7 @@
 		 * Индекс в массиве $vf["log"], указывающий на файл для логирования данного типа исключения.  
 		 * @var string
 		 */
-		protected $logFile="excLog";
+		protected $logFile="formatExcLog";
 		
 		/**
 		 * Переменная в массиве $vf["exc"], определяющая нужно ли логировать данный тип исключения.
@@ -42,7 +42,6 @@
 		 * @param string $type Тип исключения
 		 * @param int $code Код и исключения
 		 * @param Exception $previous Исключение вызвавшее текущее исключени
-		 * @return SqlException Экземпляр класса
 		 */
 		public function __construct($mes, $type, $code=0, Exception $previous = NULL){
 			parent::__construct($mes,$type,$code, $previous);
