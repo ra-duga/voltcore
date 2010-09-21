@@ -126,7 +126,7 @@
 			$this->nameTable=$this->DB->escapeKeys($nameTab);
 			$this->idNameField=$this->DB->escapeKeys($idNameField);
 			$this->nameField=$this->DB->escapeKeys($nameField);
-			$this->orderField=$this->DB->escapeKeys($orderField);
+			$this->orderField=$orderField ? $this->DB->escapeKeys($orderField) : null;
 		}
 				
 		/**
@@ -233,15 +233,17 @@
 		 */
 		protected function getIdByName($name, $haveNames, $child=true){
 			$id=$this->DB->escapeString($name);
+			$sql="select id from $this->nameTable where $this->nameField=$id";
 			if ($child){
 				if ($this->haveChildName($haveNames)){
-					$id=$DB->getVal("select id from $this->nameTable where $this->nameField=$id");
+					$id=$this->DB->getVal($sql);
 				}
 			}else{
 				if ($this->haveParentName($haveNames)){
-					$id=$DB->getVal("select id from $this->nameTable where $this->nameField=$id");
+					$id=$this->DB->getVal($sql);
 				}
 			}
+			if (is_null($id) || $id===false) throw new SqlException("Идентификатор не найден","Нет данных",$sql);
 			return $id;
 		}
 
@@ -252,7 +254,7 @@
 		 * @return int Номер узла по-порядку.
 		 * @throws SqlException При ошибке работы с базой.
 		 */
-		protected function getOrderNum($id){
+		public function getOrderNum($id){
 			$orderNum=$this->DB->getVal("select $this->orderField from $this->nameTable where $this->idNameField=$id");
 			return $orderNum+0;
 		}
@@ -267,10 +269,10 @@
 		 */
 		protected function prepareForNewOrder($idParent, $orderNum=null){
 			$sorder=$orderNum+0;
-			if ($sorder){
+			if ($sorder>0){
 				$this->familyMove($idParent, $sorder);
 			}else{
-				$sorder=$this->getFamilyNext($idParent);
+				$sorder=$this->getFamilyNextNum($idParent);
 			}
 			return $sorder;
 		}
@@ -290,7 +292,7 @@
 			$endNum+=0;
 			if ($startNum==$endNum) return;
 			$set='';
-			$where=$this->idNameField." in (".$this->getChildsQuery().")";
+			$where=$this->idNameField." in (".$this->getChildsQuery($idParent).")";
 			
 			if ($direction==DBTree::MOVE_DOWN){
 				$symbol="+";
@@ -318,10 +320,10 @@
 		 */
 		protected function insertChild($idChild,$idParent=null, $orderNum=null){
 			if ($this->orderField){
-				$this->prepareForNewOrder($idParent, $orderNum);
-				$idChild=$DB->insert("insert into $this->nameTable($this->nameField, $this->orderField) values($idChild, $sorder)");
+				$sorder=$this->prepareForNewOrder($idParent, $orderNum);
+				$idChild=$this->DB->insert("insert into $this->nameTable($this->nameField, $this->orderField) values($idChild, $sorder)");
 			}else{
-				$idChild=$DB->insert("insert into $this->nameTable($this->nameField) values($idChild)");
+				$idChild=$this->DB->insert("insert into $this->nameTable($this->nameField) values($idChild)");
 			}
 			return $idChild;
 		}
@@ -394,10 +396,15 @@
 		public function setOrderNum($id, $orderNum, $haveNames=DBTree::NO_NAME){
 			if (!$this->nameTable || !$this->nameField || !$this->orderField) throw new FormatException("Недостаточно данных.","Указаны не все данные");
 			
-			$newOrder=$orderNum+0;
 			$idChild=$this->getIdByName($id, $haveNames);
 			$idParent=$this->getParent($idChild);
 
+			$newOrder=$orderNum+0;
+			if ($newOrder<1){
+				$newOrder=$this->getFamilyNextNum($idParent)-1;
+			}
+			
+			
 			$oldOrder=$this->getOrderNum($idChild);
 			if ($oldOrder==$newOrder) return;
 			
@@ -421,6 +428,28 @@
 		}
 		
 		/**
+		 * Изменяет порядковый номер узла.
+		 * 
+		 * @param mixed $id Идентификатор узла.
+		 * @param int $positions На сколько позиций перемещать.
+		 * @param int $direction Куда перемещать.
+		 * @param int $haveNames Определяет, какие параметры считать именами.
+		 */
+		public function moveNode($id, $positions=1, $direction=DBTree::MOVE_DOWN, $haveNames=DBTree::NO_NAME){
+			if (!$this->nameTable || !$this->nameField || !$this->orderField) throw new FormatException("Недостаточно данных.","Указаны не все данные");
+			
+			$idChild=$this->getIdByName($id, $haveNames);
+			$oldNum=$this->getOrderNum($idChild);
+			if ($direction==DBTree::MOVE_UP){
+				$newNum=$oldNum-$positions;
+				$newNum=max($newNum,1);
+			}else{
+				$newNum=$oldNum+$positions;
+			}
+			$this->setOrderNum($idChild, $newNum);
+		}
+		
+		/**
 		 * Меняет родителя у узла.
 		 * 
 		 * @param mixed $id Идентификатор того, у кого меняем родителя.
@@ -435,15 +464,25 @@
 			if ($this->orderField && (!$this->nameTable || !$this->nameField || !$this->orderField)) throw new FormatException("Недостаточно данных.","Указаны не все данные");
 			$DB=$this->DB;
 			try{
-				$DB->startTran();
 				$idChild=$this->getIdByName($id, $haveNames);
 				$idParent=$this->getIdByName($parId, $haveNames, false);
+				$oldParent=$this->getParent($idChild);
 				
+				if ($idChild==$idParent){
+					throw new FormatException("Нельзя замкнуть узел на себя.","Неверные данные");
+				}
+				if ($oldParent==$idParent){
+					if ($orderNum){
+						$this->setOrderNum($idChild, $orderNum);
+					}
+					return;
+				}
+				
+				$DB->startTran();
 				if ($this->orderField){
-					$oldParent=$this->getParent($idChild);
 					$oldNum=$this->getOrderNum($idChild);
 					$this->familyMove($oldParent, $oldNum+1, DBTree::MOVE_UP);
-					$this->prepareForNewOrder($idParent, $orderNum);
+					$sorder=$this->prepareForNewOrder($idParent, $orderNum);
 					$this->DB->update("update $this->nameTable set $this->orderField=$sorder where $this->idNameField=$idChild");
 				}
 				
@@ -469,9 +508,16 @@
 			if (!$this->nameTable || !$this->nameField) throw new FormatException("Недостаточно.","Указаны не все данные");
 			$DB=$this->DB;
 			try{
-				$DB->startTran();
 				$idChild=$this->getIdByName($id,$haveNames);
-
+				if ($idChild==1) throw new FormatException('Нельзя удалить корень дерева','Неверные данные');
+				
+				if ($this->orderField){
+					$oldParent=$this->getParent($idChild);
+					$oldNum=$this->getOrderNum($idChild);
+					$this->familyMove($oldParent, $oldNum+1, DBTree::MOVE_UP);
+				}
+				
+				$DB->startTran();
 				$this->doDeleteSubTree($idChild);
 				
 				$DB->commit();
@@ -491,10 +537,14 @@
 		 */
 		public function getParent($id, $haveNames=DBTree::NO_NAME){
 			if (!$this->nameTable || !$this->nameField) throw new FormatException("Недостаточно данных.","Указаны не все данные");
-			
-			$idChild=$this->getIdByName($id, $haveNames);
 
+			$idChild=$this->getIdByName($id, $haveNames);
+			if($idChild==1) return 1;
+			
 			$select=$this->getSelectParent($idChild);
-			return $this->DB->getVal($select);
+			$pid=$this->DB->getVal($select);
+
+			if (is_null($pid) || $pid===false) throw new SqlException("Идентификатор не найден","Нет данных",$select);
+			return $pid;
 		}
 	} 

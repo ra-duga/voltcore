@@ -60,16 +60,18 @@
 		}
 				
 		protected function doChangePar($idChild, $idParent){
-			$DB->update("update $this->table set $this->idParField=$idParent where $thisidField=$idChild");
+			$this->DB->update("update $this->table set $this->idParField=$idParent where $this->idField=$idChild");
 		}
 	
 		protected function doDeleteSubTree($idChild){
 			$DB=$this->DB;
-			$DB->delete("delete from $this->table where $this->idField=$idChild or $this->idParField=$idChild");
-			while ($DB->affectRows()>0){
-				$DB->delete("delete from $this->nameTable where $this->idNameField not in (select $this->idField from $this->table)");
-				$DB->delete("delete from $this->table where $this->idParField not in (select $this->idNameField from $this->nameTable)");
+			$numDeleted=0;
+			$numDeleted=$DB->delete("delete from $this->table where $this->idField=$idChild or $this->idParField=$idChild");
+			while ($numDeleted>0){
+				$ids=implode(",",$DB->getColumn("select $this->idNameField from $this->nameTable where $this->idNameField not in (select $this->idField from $this->table)"));
+				$numDeleted=$DB->delete("delete from $this->table where $this->idParField in ($ids)");
 			}
+			$DB->delete("delete from $this->nameTable where $this->idNameField not in (select $this->idField from $this->table)");
 		}
 		
 		public function getTree($extraFields=null, $subTreeRoot=1){

@@ -135,7 +135,7 @@
 		 * @access protected
 		 * @return int Количество строк, обработанных последним запросом
 		 */
-		protected function affectRows(){
+		public function affectRows(){
 			return $this->getSystemVal("select @@ROWCOUNT as smth");
 		}
 
