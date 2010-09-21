@@ -194,7 +194,7 @@
 		 * @access protected
 		 * @return int количество строк, обработанных последним запросом
 		 */
-		abstract protected function affectRows();
+		abstract public function affectRows();
 
 		/**
 		 * Начинает транзакцию
@@ -278,7 +278,7 @@
 		 * @return string Строковое представление объекта
 		 */
 		public function __toString(){
-			return get_class($this)."://$login:$pass@$host/$db";
+			return get_class($this)."://$this->login:$this->pass@$this->host/$this->db";
 		}
 
 		/**

@@ -18,7 +18,7 @@
 	 * @subpackage tests
 	 * @abstract
 	 */
-	 class Tester{
+	 abstract class Tester{
 	 	
 	 	static $logFile;
 	 	
@@ -43,7 +43,7 @@
 		 */
 		static public function startTesting($arrClasses, $print=false, $db){
 			Tester::$logFile=VCROOT."/reports/test_".date("d-m-Y_H-i").".log";
-			self::createDB($db);
+			//self::createDB($db);
 			foreach($arrClasses as $class){
 				$tester=$class."_Tester";
 				$obj=new $tester($print, $db);
@@ -77,7 +77,7 @@
 			$db->exec("CREATE DATABASE [$dbName] ON  PRIMARY 
 				( NAME = N'$dbName', FILENAME = N'D:\\MSSQLDataBases\\$dbName.mdf' , SIZE = 3072KB , FILEGROWTH = 1024KB )
  					LOG ON 
-				( NAME = N'$dbName_log', FILENAME = N'D:\\MSSQLDataBases\\$dbName_log.ldf' , SIZE = 1024KB , FILEGROWTH = 10%)");
+				( NAME = N'$dbName"."_log', FILENAME = N'D:\\MSSQLDataBases\\$dbName"."_log.ldf' , SIZE = 1024KB , FILEGROWTH = 10%)");
 			$db->exec("EXEC dbo.sp_dbcmptlevel @dbname=N'$dbName', @new_cmptlevel=90");
 			$db->exec("IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
 				begin
@@ -123,9 +123,9 @@
 	 	 * Создает тестовую базу данных. 
 	 	 */
 	 	static protected function createDB($db){
-	 		$subd=$this->determineDB($db);
+	 		$subd=Tester::determineDB($db);
 	 		$method="create$subd";
- 			$this->$method($db);
+ 			Tester::$method($db);
 	 	}		
 		
 		/**
@@ -143,11 +143,28 @@
 			if ($this->print){
 				if ($h1){
 					echo "<h1>$header</h1>";
+				}else{
+					echo "<h2>$header</h2>";
 				}
 			}else{
 				logToFile($header.PHP_EOL, Tester::$logFile, 'test');
 			}
 		} 
+		
+		/**
+		 * Печатает заголовок.
+		 * 
+		 * @param string $header Текст заголовка.
+		 * @param bool $h1 true - заголовок модуля, false - метода
+		 */
+		protected function printEnd($header){
+			if ($this->print){
+				echo "<p class='end'>Конец работы $header</p>";
+			}else{
+				logToFile("Конец работы $header".PHP_EOL, Tester::$logFile, 'test');
+			}
+		} 
+		
 		
 		/**
 		 * Печатает текст.
@@ -163,6 +180,13 @@
 			}
 		}
 		
+		/**
+		 * Проверяет на равенство и выводит результат.
+		 * 
+		 * @param mixed $rez Результат дейсвий.
+		 * @param mixed $right Правильный результат.
+		 * @param string $title Заголовок.
+		 */
 		protected function check($rez, $right, $title){
 			if ($rez==$right){
 				$this->printText($title." => <span class='ok'>Успешно</span>");
@@ -199,5 +223,13 @@
  			$this->$method();
 	 	}
 	 	
+	 	/**
+	 	 * Удаляет тестовые таблицы.
+	 	 */
+	 	protected function deleteTables(){
+	 		$subd=Tester::determineDB($this->db);
+	 		$method="deleteTables$subd";
+ 			$this->$method();
+	 	}
 	 	
 	 }

@@ -124,7 +124,7 @@
 		 * @access protected
 		 * @return int Количество строк, обработанных последним запросом
 		 */
-		protected function affectRows(){
+		public function affectRows(){
 			return mysqli_affected_rows($this->link);
 		}
 
