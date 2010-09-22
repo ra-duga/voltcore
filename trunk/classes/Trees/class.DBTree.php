@@ -278,7 +278,7 @@
 		 */
 		public function getOrderNum($id){
 			$orderNum=$this->DB->getVal("select $this->orderField from $this->nameTable where $this->idNameField=$id");
-			return $orderNum+0;
+			return intval($orderNum);
 		}
 	
 		/**
@@ -290,7 +290,7 @@
 		 * @throws SqlException При ошибке работы с базой.
 		 */
 		protected function prepareForNewOrder($idParent, $orderNum=null){
-			$sorder=$orderNum+0;
+			$sorder=intval($orderNum);
 			if ($sorder>0){
 				$this->familyMove($idParent, $sorder);
 			}else{
@@ -421,7 +421,7 @@
 			$idChild=$this->getIdByName($id, $haveNames);
 			$idParent=$this->getParent($idChild);
 
-			$newOrder=$orderNum+0;
+			$newOrder=intval($orderNum);
 			if ($newOrder<1){
 				$newOrder=$this->getFamilyNextNum($idParent)-1;
 			}
