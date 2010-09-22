@@ -3,7 +3,7 @@
 	 * @author Костин Алексей Васильевич aka Volt(220)
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
-	 * @version 1.0
+	 * @version 2.0
 	 * @package classes
 	 * @subpackage Trees
 	 */
@@ -16,7 +16,6 @@
 	 * <p>Если используется возможность идентифицировать узел по имени в таблице имен, то имя в таблице имен должно быть уникальным.</p>
 	 * <p>Сортировка:</p>
 	 * <p>Элементам присваивается номер по-порядку в пределах одного родителя.</p>
-	 * 
 	 * 
 	 * @TODO Больше возможностей (выбор пути, выбор уровня) 
 	 * 
@@ -102,6 +101,12 @@
 		protected $orderField;
 		
 		/**
+		 * Идентификатор корня.
+		 * @var mixed
+		 */
+		protected $rootId;
+		
+		/**
 		 * Объект для работы с БД
 		 * @var SQLDB
 		 */
@@ -110,25 +115,40 @@
 		/**
 		 * Конструктор.
 		 * 
-		 * @param string $tab Таблица, в которой лежит дерево.
-		 * @param string $idName Имя поля с идентификаторами.
-		 * @param string $idParName Имя поля с идентификаторами родителей. 
-		 * @param string $nameTab Имя таблицы, в которой содержатся имена узлов. 
-		 * @param string $nameField Имя поля, в котором содержатся имена узлов.
-		 * @param string $orderField Имя поля, по которому происходит сортировка.
-		 * @param string $orderType Тип сортировки.
-		 * @param string $DBCon Объект для работы с БД.
+		 * @param array $arrNames Массив с именами.
+		 * @param SQLDB $DBCon Объект для работы с БД.
 		 */
-		public function __construct($tab, $idName, $nameTab=null, $idNameField='id', $nameField=null, $orderField=null, $DBCon=null){
+		public function __construct($arrNames, $DBCon=null){
 			$this->DB=$DBCon ? $DBCon : SQLDBFactory::getDB();
-			$this->table=$this->DB->escapeKeys($tab);
-			$this->idField=$this->DB->escapeKeys($idName);
-			$this->nameTable=$this->DB->escapeKeys($nameTab);
-			$this->idNameField=$this->DB->escapeKeys($idNameField);
-			$this->nameField=$this->DB->escapeKeys($nameField);
-			$this->orderField=$orderField ? $this->DB->escapeKeys($orderField) : null;
+			$this->assignNames($arrNames);
+			$this->findRoot();
 		}
-				
+		
+		/**
+		 * Записывает имена таблиц и полей.
+		 * 
+		 * @param array $arrNames Массив с именами. Обрабатываются поля:
+		 * 		table Таблица, в которой лежит дерево.
+		 * 		idField Имя поля с идентификаторами.
+		 * 		nameTable Имя таблицы, в которой содержатся имена узлов. 
+		 * 		idNameField Имя поля, в котором содержатся идентификаторы узлов в таблице имен.
+		 * 		nameField Имя поля, в котором содержатся имена узлов.
+		 * 		orderField Имя поля, по которому происходит сортировка.
+		 */
+		protected function assignNames($arrNames){
+			$this->table=$this->DB->escapeKeys($arrNames['table']);
+			$this->idField=$this->DB->escapeKeys($arrNames['idField']);
+			$this->nameTable=(isset($arrNames['nameTable']) && $arrNames['nameTable']) ? $this->DB->escapeKeys($arrNames['nameTable']) : null;
+			$this->idNameField=(isset($arrNames['idNameField']) && $arrNames['idNameField']) ? $this->DB->escapeKeys($arrNames['idNameField']) : null;
+			$this->nameField=(isset($arrNames['nameField']) && $arrNames['nameField']) ? $this->DB->escapeKeys($arrNames['nameField']) : null;
+			$this->orderField=(isset($arrNames['orderField']) && $arrNames['orderField']) ? $this->DB->escapeKeys($arrNames['orderField']) : null;
+		}
+		
+		/**
+		 * Определяет идентификатор корня дерева.
+		 */
+		abstract protected function findRoot();
+		
 		/**
 		 * Возвращает запрос для выбора идентифкаторов всех непосредственных потомков родителя $idParent.
 		 * 
@@ -187,6 +207,7 @@
 		 * 		Ключи массива - псевдонимы полей, которые станут ключами результирующего массива.
 		 * 		Значения полей массива - имена полей для выборки или подзапрос типа (select smth from table where ...).   
 		 * @param mixed $id Идентификатор корня поддерева. Если не указан, то возвращается все дерево.
+		 * @param int $haveNames Определяет, какие параметры считать именами.
 		 * @return array Массив с деревом. 
 		 * 		Индексами этого массива является порядковый номер узла в уровне, начиная с 0, без пропусков.
 		 * 		Узел – это массив, в которм содержатся следующие элементы:
@@ -197,7 +218,7 @@
 		 * @throws SqlException При ошибке работы с базой.
 		 * @throws FormatException Если указаны не все поля.
 		 */
-		public abstract function getTree($extraFields=null, $subTreeRoot=1);
+		public abstract function getTree($extraFields=null, $subTreeRoot=null, $haveNames=DBTree::NO_NAME);
 		
 		/**
 		 * Определяет передано ли имя ребенка или его идентификатор.
@@ -232,8 +253,9 @@
 		 * @throws SqlException При ошибке работы с базой.
 		 */
 		protected function getIdByName($name, $haveNames, $child=true){
-			$id=$this->DB->escapeString($name);
-			$sql="select id from $this->nameTable where $this->nameField=$id";
+			$id=$name;
+			$dbId=$this->DB->escapeString($name);
+			$sql="select id from $this->nameTable where $this->nameField=$dbId";
 			if ($child){
 				if ($this->haveChildName($haveNames)){
 					$id=$this->DB->getVal($sql);
@@ -339,7 +361,7 @@
 		protected function extraFieldsToQueryString($extraFields){
 			if(!$extraFields || !is_array($extraFields)) return '';
 			$rez="";
-			foreach($dopFields as $name=>$field){
+			foreach($extraFields as $name=>$field){
 				if (strPos($field, "(")===0){
 					$rez .= ", $field as $name";
 				}else{
@@ -403,7 +425,6 @@
 			if ($newOrder<1){
 				$newOrder=$this->getFamilyNextNum($idParent)-1;
 			}
-			
 			
 			$oldOrder=$this->getOrderNum($idChild);
 			if ($oldOrder==$newOrder) return;
@@ -509,7 +530,7 @@
 			$DB=$this->DB;
 			try{
 				$idChild=$this->getIdByName($id,$haveNames);
-				if ($idChild==1) throw new FormatException('Нельзя удалить корень дерева','Неверные данные');
+				if ($idChild==$this-rootId) throw new FormatException('Нельзя удалить корень дерева','Неверные данные');
 				
 				if ($this->orderField){
 					$oldParent=$this->getParent($idChild);
@@ -539,7 +560,7 @@
 			if (!$this->nameTable || !$this->nameField) throw new FormatException("Недостаточно данных.","Указаны не все данные");
 
 			$idChild=$this->getIdByName($id, $haveNames);
-			if($idChild==1) return 1;
+			if($idChild==$this-rootId) return $this-rootId;
 			
 			$select=$this->getSelectParent($idChild);
 			$pid=$this->DB->getVal($select);

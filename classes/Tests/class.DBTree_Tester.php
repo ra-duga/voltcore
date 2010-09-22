@@ -66,6 +66,12 @@
 	 	 */
 	 	abstract protected function deleteTablesmysql();
 	 	
+	 	public function __construct($print=false, $DBCon=null){
+	 		parent::__construct($print, $DBCon);
+	 		$this->createTables();
+	 		
+	 	}
+	 	
 	 	/**
 	 	 * Устанавливает эталоны деревьев.
 	 	 */
@@ -469,6 +475,39 @@
     			))
     		);
 
+    		$this->rightTrees["sortadd"][3]=array(
+  				array('id' =>1,'name' =>'0', 'sorder'=>0,'tree' => array(
+    				array('id' =>2,'name' =>'1', 'sorder'=>1,'tree' => array(
+	      				array('id' =>4,'name' =>'1.2', 'sorder'=>1,'tree' => array(
+        					array('id' =>6,'name' =>'1.2.2', 'sorder'=>1,'tree' => array(
+        						array('id' =>7,'name' =>'1.2.2.1', 'sorder'=>1,'tree' => array())
+        					)),
+        					array('id' =>8,'name' =>'1.2.3', 'sorder'=>2,'tree' => array()),
+        					array('id' =>9,'name' =>'1.2.4', 'sorder'=>3,'tree' => array())
+        				)),
+	       				array('id' =>5,'name' =>'1.3', 'sorder'=>2,'tree' => array(
+        					array('id' =>10,'name' =>'1.3.1', 'sorder'=>1,'tree' => array()),
+        					array('id' =>11,'name' =>'1.3.2', 'sorder'=>2,'tree' => array()),
+        					array('id' =>12,'name' =>'1.3.3', 'sorder'=>3,'tree' => array())
+      					)),
+    					array('id' =>3,'name' =>'1.1', 'sorder'=>3,'tree' => array())
+      				)),
+    				array('id' =>17,'name' =>'4', 'sorder'=>2,'tree' => array(
+      					array('id' =>18,'name' =>'4.1', 'sorder'=>1,'tree' => array())
+      				)),
+      				array('id' =>13,'name' =>'2', 'sorder'=>3,'tree' => array()),
+    				array('id' =>14,'name' =>'3', 'sorder'=>4,'tree' => array(
+      					array('id' =>15,'name' =>'3.1', 'sorder'=>1,'tree' => array()),
+      					array('id' =>16,'name' =>'3.2', 'sorder'=>2,'tree' => array())
+      				)),
+	  				array('id' =>19,'name' =>'5', 'sorder'=>5,'tree' => array()),
+  					array('id' =>20,'name' =>'6', 'sorder'=>6,'tree' => array(
+    					array('id' =>21,'name' =>'6.1', 'sorder'=>1,'tree' => array())
+    				))
+    			))
+    		);
+    		
+    		
     		$this->rightTrees["reorder"][0]=array(
   				array('id' =>1,'name' =>'0','tree' => array(
     				array('id' =>2,'name' =>'1','tree' => array(
@@ -725,6 +764,38 @@
       			))
     		);
 
+    		$this->rightTrees["reorder"][8]=array(
+  				array('id' =>1,'name' =>'0', 'sorder'=>0,'tree' => array(
+	  				array('id' =>19,'name' =>'5', 'sorder'=>1,'tree' => array()),
+  					array('id' =>17,'name' =>'4', 'sorder'=>2,'tree' => array(
+      					array('id' =>18,'name' =>'4.1', 'sorder'=>1,'tree' => array())
+      				)),
+  					array('id' =>20,'name' =>'6', 'sorder'=>3,'tree' => array(
+    					array('id' =>21,'name' =>'6.1', 'sorder'=>1,'tree' => array())
+    				)),
+    				array('id' =>13,'name' =>'2', 'sorder'=>4,'tree' => array()),
+      				array('id' =>14,'name' =>'3', 'sorder'=>5,'tree' => array(
+      					array('id' =>15,'name' =>'3.1', 'sorder'=>1,'tree' => array()),
+      					array('id' =>16,'name' =>'3.2', 'sorder'=>2,'tree' => array())
+      				)),
+      				array('id' =>2,'name' =>'1', 'sorder'=>6,'tree' => array(
+    					array('id' =>3,'name' =>'1.1', 'sorder'=>1,'tree' => array()),
+    					array('id' =>4,'name' =>'1.2', 'sorder'=>2,'tree' => array(
+        					array('id' =>6,'name' =>'1.2.2', 'sorder'=>1,'tree' => array(
+        						array('id' =>7,'name' =>'1.2.2.1', 'sorder'=>1,'tree' => array())
+        					)),
+        					array('id' =>8,'name' =>'1.2.3', 'sorder'=>2,'tree' => array()),
+        					array('id' =>9,'name' =>'1.2.4', 'sorder'=>3,'tree' => array())
+        				)),
+	       				array('id' =>5,'name' =>'1.3', 'sorder'=>3,'tree' => array(
+        					array('id' =>10,'name' =>'1.3.1', 'sorder'=>1,'tree' => array()),
+        					array('id' =>11,'name' =>'1.3.2', 'sorder'=>2,'tree' => array()),
+        					array('id' =>12,'name' =>'1.3.3', 'sorder'=>3,'tree' => array())
+      					))
+      				))
+      			))
+    		);
+    		
     		$this->rightTrees["sortmove"][0]=array(
   				array('id' =>1,'name' =>'0','tree' => array(
 	  				array('id' =>19,'name' =>'5','tree' => array()),
@@ -788,6 +859,74 @@
         					array('id' =>12,'name' =>'1.3.3','tree' => array())
       					))
       				))
+      			))
+    		);
+
+			$this->rightTrees["sortdelete"][0]=array(
+  				array('id' =>1,'name' =>'0','tree' => array(
+	  				array('id' =>19,'name' =>'5','tree' => array()),
+  					array('id' =>17,'name' =>'4','tree' => array(
+      					array('id' =>18,'name' =>'4.1','tree' => array())
+      				)),
+  					array('id' =>20,'name' =>'6','tree' => array(
+    					array('id' =>21,'name' =>'6.1','tree' => array(
+      						array('id' =>14,'name' =>'3','tree' => array(
+      							array('id' =>15,'name' =>'3.1','tree' => array()),
+      							array('id' =>16,'name' =>'3.2','tree' => array())
+      						)),
+    						array('id' =>4,'name' =>'1.2','tree' => array(
+        						array('id' =>6,'name' =>'1.2.2','tree' => array(
+        							array('id' =>7,'name' =>'1.2.2.1','tree' => array())
+        						)),
+        						array('id' =>8,'name' =>'1.2.3','tree' => array()),
+        						array('id' =>9,'name' =>'1.2.4','tree' => array())
+        					))
+    					))
+    				)),
+    				array('id' =>13,'name' =>'2','tree' => array())
+      			))
+    		);
+
+    		
+    		$this->rightTrees["sortdelete"][1]=array(
+  				array('id' =>1,'name' =>'0','tree' => array(
+  					array('id' =>17,'name' =>'4','tree' => array(
+      					array('id' =>18,'name' =>'4.1','tree' => array())
+      				)),
+  					array('id' =>20,'name' =>'6','tree' => array(
+    					array('id' =>21,'name' =>'6.1','tree' => array(
+      						array('id' =>14,'name' =>'3','tree' => array(
+      							array('id' =>15,'name' =>'3.1','tree' => array()),
+      							array('id' =>16,'name' =>'3.2','tree' => array())
+      						)),
+    						array('id' =>4,'name' =>'1.2','tree' => array(
+        						array('id' =>6,'name' =>'1.2.2','tree' => array(
+        							array('id' =>7,'name' =>'1.2.2.1','tree' => array())
+        						)),
+        						array('id' =>8,'name' =>'1.2.3','tree' => array()),
+        						array('id' =>9,'name' =>'1.2.4','tree' => array())
+        					))
+    					))
+    				)),
+    				array('id' =>13,'name' =>'2','tree' => array())
+      			))
+    		);
+
+    		$this->rightTrees["sortdelete"][2]=array(
+  				array('id' =>1,'name' =>'0','tree' => array(
+  					array('id' =>17,'name' =>'4','tree' => array(
+      					array('id' =>18,'name' =>'4.1','tree' => array())
+      				)),
+    				array('id' =>13,'name' =>'2','tree' => array())
+      			))
+    		);
+    		
+    		$this->rightTrees["sortdelete"][3]=array(
+  				array('id' =>1,'name' =>'0', 'sorder'=>0,'tree' => array(
+  					array('id' =>17,'name' =>'4', 'sorder'=>1,'tree' => array(
+      					array('id' =>18,'name' =>'4.1', 'sorder'=>1,'tree' => array())
+      				)),
+    				array('id' =>13,'name' =>'2', 'sorder'=>2,'tree' => array())
       			))
     		);
 	 	}
@@ -883,6 +1022,8 @@
 	 		$this->sortTree->add('6.1','6', DBTree::BOTH_NAME);
 	 		$this->check(null, $this->rightTrees["sortadd"][2], "Проверка всего дерева", true, true);
 	 		
+	 		$arr=$this->sortTree->getTree(array('sorder'=>"sorder"));
+	 		$this->check($arr, $this->rightTrees["sortadd"][3], "Проверка выбора с доп. параметрами");
 	 	}
 	 	
 	 	/**
@@ -907,6 +1048,9 @@
 	 		$this->check(null, $this->rightTrees["reorder"][6], "Перестановка на 2 вниз", true,true);
 	 		$this->sortTree->moveNode(19,100,DBTree::MOVE_UP);
 	 		$this->check(null, $this->rightTrees["reorder"][7], "Перестановка выше возможного", true,true);
+
+	 		$arr=$this->sortTree->getTree(array('sorder'=>"sorder"));
+	 		$this->check($arr, $this->rightTrees["reorder"][8], "Проверка правильной сортировки");
 	 	}
 	 	
 	 	/**
@@ -920,7 +1064,26 @@
  			
 	 		$this->sortTree->changePar('3','6.1', DBTree::BOTH_NAME,1);
 	 		$this->check(null, $this->rightTrees["sortmove"][1], "Перемещение с сортировкой и указанием номера по-порядку", true, true);
-	 	} 
+	 	}
+
+	 	/**
+	 	 * Тестирует удаление сортированных данных.
+	 	 */
+	 	protected function testDeleteSortData(){
+ 			$this->printHeader("Тесты удаления с сортировкой", false);
+ 			
+	 		$this->sortTree->deleteSubTree('1', DBTree::BOTH_NAME);
+	 		$this->check(null, $this->rightTrees["sortdelete"][0], "Удаление c конца", true, true);
+ 			
+	 		$this->sortTree->deleteSubTree('5', DBTree::BOTH_NAME);
+	 		$this->check(null, $this->rightTrees["sortdelete"][1], "Удаление с начала", true, true);
+	 		
+	 		$this->sortTree->deleteSubTree('6', DBTree::BOTH_NAME);
+	 		$this->check(null, $this->rightTrees["sortdelete"][2], "Удаление с середины", true, true);
+	 		
+	 		$arr=$this->sortTree->getTree(array('sorder'=>"sorder"));
+	 		$this->check($arr, $this->rightTrees["sortdelete"][3], "Проверка правильной сортировки после удаления");
+	 	}
 	 	
 	 	/**
 	 	 * Тестирует определение родителя.
@@ -1090,7 +1253,6 @@
 	 		}catch(SqlException $e){
 	 			$this->check(true, true, "Попытка создать связь для несуществующего узла");
 	 		}
-	 		
 	 	}
 	 	
 		public function goTest(){
@@ -1111,7 +1273,7 @@
 				$this->testAddSortData();
 	 			$this->testReOrderData();
 				$this->testMoveSortData();
-/*	 			$this->testDeleteSortData();*/
+	 			$this->testDeleteSortData();
 	 			
 	 			$this->printEnd($this->header);
 			}catch(TestException $e){

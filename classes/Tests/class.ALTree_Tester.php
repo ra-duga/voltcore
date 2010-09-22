@@ -19,8 +19,14 @@
 	 	public function __construct($print=false, $DBCon=null){
 	 		parent::__construct($print, $DBCon);
 	 		$this->header="ALTree тестер!";
-	 		$this->tree= new ALTree("ALTree", "cid", "pid", "ALTreeData",  'id', "content", null, $DBCon);
-			$this->sortTree= new ALTree("ALSortTree", "cid", "pid", "ALSortTreeData",  'id', "content", "sorder", $DBCon);
+	 		
+	 		$arrFields=array("table"=>"ALTree", "idField"=>"cid", "idParField"=>"pid",
+	 			"nameTable"=>"ALTreeData","idNameField"=>"id", "nameField"=>"content");
+	 		$this->tree= new ALTree($arrFields, $DBCon);
+
+	 		$arrSortFields=array("table"=>"ALSortTree", "idField"=>"cid", "idParField"=>"pid",
+	 			"nameTable"=>"ALSortTreeData","idNameField"=>"id", "nameField"=>"content", "orderField"=>"sorder");
+	 		$this->sortTree= new ALTree($arrSortFields, $DBCon);
 	 	}
 	 	
 	 	protected function createTablesmssql(){
@@ -60,25 +66,30 @@
 			global $vf;
 			$dbName=$vf["test"]["db"];
 			$db=$this->db;
+	 		$db->exec("use $dbName");
 			$this->deleteTablesmysql();
 			
 			$db->exec("create table ALSortTreeData (
-		 		id int Primory key AUTO_INCREMENT,
+		 		id int PRIMARY KEY AUTO_INCREMENT,
 		 		content varchar(20) unique,
 		 		sorder int not null
 		 	) ENGINE=InnoDB");
 	 		$db->exec("create table ALTreeData (
-	 			id int Primory key AUTO_INCREMENT,
+	 			id int PRIMARY KEY AUTO_INCREMENT,
 		 		content varchar(20) unique
 	 		) ENGINE=InnoDB");
 	 		$db->exec("create table ALTree (
-		 		cid int REFERENCES ALTreeData(id) on delete no action on update no action,
-		 		pid int REFERENCES ALTreeData(id) on delete no action on update no action
-	 		) ENGINE=InnoDB");
+		 		cid int,
+		 		pid int,
+		 		FOREIGN KEY (cid) REFERENCES ALTreeData(id) on delete no action on update no action,
+		 		FOREIGN KEY (pid) REFERENCES ALTreeData(id) on delete no action on update no action
+		 		) ENGINE=InnoDB");
 	 		$db->exec("create table ALSortTree (
-		 		cid int REFERENCES ALSortTreeData(id) on delete no action on update no action,
-		 		pid int REFERENCES ALSortTreeData(id) on delete no action on update no action
-	 		) ENGINE=InnoDB");
+		 		cid int,
+		 		pid int,
+		 		FOREIGN KEY (cid) REFERENCES ALSortTreeData(id) on delete no action on update no action,
+		 		FOREIGN KEY (pid) REFERENCES ALSortTreeData(id) on delete no action on update no action
+		 		) ENGINE=InnoDB");
 	 		
 	 		$db->insert("insert into ALTreeData(content) values('0')");
 	 		$db->insert("insert into ALTree(cid, pid) values(1,1)");
@@ -110,6 +121,7 @@
 			global $vf;
 			$dbName=$vf["test"]["db"];
 	 		$db=$this->db;
+	 		$db->exec("use $dbName");
 	 		
 			$db->exec("DROP TABLE IF EXISTS ALTree");
 			$db->exec("DROP TABLE IF EXISTS ALSortTree");
