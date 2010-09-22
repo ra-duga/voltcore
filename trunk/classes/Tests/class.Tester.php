@@ -43,7 +43,7 @@
 		 */
 		static public function startTesting($arrClasses, $print=false, $db){
 			Tester::$logFile=VCROOT."/reports/test_".date("d-m-Y_H-i").".log";
-			//self::createDB($db);
+			self::createDB($db);
 			foreach($arrClasses as $class){
 				$tester=$class."_Tester";
 				$obj=new $tester($print, $db);

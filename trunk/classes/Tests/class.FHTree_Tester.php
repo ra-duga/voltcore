@@ -19,8 +19,14 @@
 	 	public function __construct($print=false, $DBCon=null){
 	 		parent::__construct($print, $DBCon);
 	 		$this->header="FHTree тестер!";
-	 		$this->tree= new FHTree("FHTree", "cid", "pid", "level", "FHTreeData",  'id', "content", null, $DBCon);
-			$this->sortTree= new FHTree("FHSortTree", "cid", "pid", "level", "FHSortTreeData",  'id', "content", "sorder", $DBCon);
+	 		
+	 		$arrFields=array("table"=>"FHTree", "idField"=>"cid", "idParField"=>"pid", "levelField"=>"level",
+	 			"nameTable"=>"FHTreeData","idNameField"=>"id", "nameField"=>"content");
+	 		$this->tree= new FHTree($arrFields, $DBCon);
+	 		
+	 		$arrSortFields=array("table"=>"FHSortTree", "idField"=>"cid", "idParField"=>"pid", "levelField"=>"level",
+	 			"nameTable"=>"FHSortTreeData","idNameField"=>"id", "nameField"=>"content", "orderField"=>"sorder");
+	 		$this->sortTree= new FHTree($arrSortFields, $DBCon);
 	 	}
 	 	
 	 	protected function createTablesmssql(){
@@ -62,33 +68,37 @@
 			global $vf;
 			$dbName=$vf["test"]["db"];
 			$db=$this->db;
+	 		$db->exec("use $dbName");
 			$this->deleteTablesmysql();
 			
 			$db->exec("create table FHSortTreeData (
-		 		id int Primory key AUTO_INCREMENT,
+		 		id int PRIMARY KEY AUTO_INCREMENT,
 		 		content varchar(20) unique,
 		 		sorder int not null
 		 	) ENGINE=InnoDB");
 	 		$db->exec("create table FHTreeData (
-	 			id int Primory key AUTO_INCREMENT,
+	 			id int PRIMARY KEY AUTO_INCREMENT,
 		 		content varchar(20) unique
 	 		) ENGINE=InnoDB");
 	 		$db->exec("create table FHTree (
-		 		cid int REFERENCES FHTreeData(id) on delete no action on update no action,
-		 		pid int REFERENCES FHTreeData(id) on delete no action on update no action,
-		 		level int not null
-	 		) ENGINE=InnoDB");
+		 		cid int,
+		 		pid int,
+		 		level int not null,
+		 		FOREIGN KEY (cid) REFERENCES FHTreeData(id) on delete no action on update no action,
+		 		FOREIGN KEY (pid) REFERENCES FHTreeData(id) on delete no action on update no action
+		 		) ENGINE=InnoDB");
 	 		$db->exec("create table FHSortTree (
-		 		cid int REFERENCES FHSortTreeData(id) on delete no action on update no action,
-		 		pid int REFERENCES FHSortTreeData(id) on delete no action on update no action,
-		 		level int not null
-	 		) ENGINE=InnoDB");
+		 		cid int,
+		 		pid int,
+		 		level int not null,
+		 		FOREIGN KEY (cid) REFERENCES FHSortTreeData(id) on delete no action on update no action,
+		 		FOREIGN KEY (pid) REFERENCES FHSortTreeData(id) on delete no action on update no action
+		 		) ENGINE=InnoDB");
 	 		
 	 		$db->insert("insert into FHTreeData(content) values('0')");
 	 		$db->insert("insert into FHTree(cid, pid, level) values(1,1,0)");
 	 		$db->insert("insert into FHSortTreeData(content, sorder) values('0', 0)");
 	 		$db->insert("insert into FHSortTree(cid, pid, level) values(1,1,0)");
-	 		
 	 	}
 	 	
 	 	protected function insertTestData(){
@@ -114,6 +124,7 @@
 			global $vf;
 			$dbName=$vf["test"]["db"];
 	 		$db=$this->db;
+	 		$db->exec("use $dbName");
 	 		
 			$db->exec("DROP TABLE IF EXISTS FHTree");
 			$db->exec("DROP TABLE IF EXISTS FHSortTree");

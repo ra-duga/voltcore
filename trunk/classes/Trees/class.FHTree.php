@@ -3,7 +3,7 @@
 	 * @author Костин Алексей Васильевич aka Volt(220)
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
-	 * @version 1.0
+	 * @version 2.0
 	 * @package classes
 	 * @subpackage Trees
 	 */
@@ -12,10 +12,10 @@
 	 * Класс для работы с деревом. Дерево хранится по принципу Full Hierarchy (Redundant Adjacency List по другим источникам). 
 	 * 
 	 * Данная реализация принципа предполагает:
-	 * 1)Существует корневой элемент с id = 1. 
+	 * 1)Существует корневой элемент. 
 	 * 2)В таблице есть три колонки: идентификатор узла, идентификатор родителя, уровень.
 	 * 3)У узла создается запись для каждого родителя с указанием уровня (первый родитель - 1, родитель родителя - 2 и т.д.).
-	 * 4)Каждый узел, кроме корня, имеет как минимум 2 записи - ссылка на себя с уровнем 0 и ссылка на корневой элемент с id = 1. 
+	 * 4)Каждый узел, кроме корня, имеет как минимум 2 записи - ссылка на себя с уровнем 0 и ссылка на корневой элемент. 
 	 * 
 	 * @package classes
 	 * @subpackage Trees
@@ -34,16 +34,38 @@
 		 */
 		private $levelField;
 	
+		public function __construct($arrNames, $DBCon=null){
+			parent::__construct($arrNames, $DBCon);
+		}
+		
 		/**
-		 * @param string $idParName Имя поля с идентификаторами родителей. 
-		 * @param string $levelName Имя поля уровня.
+		 * Записывает имена таблиц и полей.
+		 * 
+		 * @param array $arrNames Массив с именами. Обрабатываются поля:
+		 * 		(родителем - DBTree)
+		 * 		table Таблица, в которой лежит дерево.
+		 * 		idField Имя поля с идентификаторами.
+		 * 		nameTable Имя таблицы, в которой содержатся имена узлов. 
+		 * 		idNameField Имя поля, в котором содержатся идентификаторы узлов в таблице имен.
+		 * 		nameField Имя поля, в котором содержатся имена узлов.
+		 * 		orderField Имя поля, по которому происходит сортировка.
+		 * 		(потомком - FHTree)
+		 * 		idParField Имя поля с идентификаторами родителей. 
+		 * 		levelField Имя поля с уровнем.
 		 */
-		public function __construct($tab, $idName, $idParName, $levelName, $nameTab=null,  $idNameField='id', $nameField=null, $orderField=null, $DBCon=null){
-			parent::__construct($tab, $idName, $nameTab,$idNameField, $nameField, $orderField, $DBCon);
-			$this->idParField=$this->DB->escapeKeys($idParName);
-			$this->levelField=$this->DB->escapeKeys($levelName);
+		protected function assignNames($arrNames){
+			parent::assignNames($arrNames);
+			$this->idParField=$this->DB->escapeKeys($arrNames['idParField']);
+			$this->levelField=$this->DB->escapeKeys($arrNames['levelField']);
 		}
 
+		protected function findRoot(){
+			$sql="select $this->idField from $this->table where $this->idField=$this->idParField";
+			$id=$this->DB->getVal($sql);
+			if (is_null($id) || $id===false) throw new SqlException("Корневой элемент не найден","Нет данных",$sql);
+			$this->rootId=$id;			
+		}
+		
 		protected function getChildsQuery($idParent){
 			return "select $this->idField from $this->table where $this->idParField=$idParent and $this->levelField=1";
 		}		
@@ -114,11 +136,14 @@
 			$DB->delete($delete);
 			$DB->delete($deleteName);
 		}
-		
-		
 	
-		public function getTree($extraFields=null, $subTreeRoot=1){
+		public function getTree($extraFields=null, $subTreeRoot=null, $haveNames=DBTree::NO_NAME){
 			if (!$this->nameTable || !$this->nameField) throw new FormatException("Недостаточно данных для создания дерева.","Указаны не все данные");
+			if (is_null($subTreeRoot)){
+				$subTreeRoot=$this->rootId;
+			}else{
+				$subTreeRoot=$this->getIdByName($subTreeRoot, $haveNames);
+			}
 			$sFiled= $this->orderField ? "c.$this->orderField," : '';
 			$extra= $this->extraFieldsToQueryString($extraFields);
 			//Переприсваивание для создания более читаемого запроса
@@ -159,8 +184,7 @@
 			}
 			$tree=array();
 			if ($path){
-				reset($path);
-				$tree[0]=$path[key($path)];
+				$tree[0]=reset($path);
 			}
 			return $tree;
 		}

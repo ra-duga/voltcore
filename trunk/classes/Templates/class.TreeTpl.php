@@ -22,7 +22,7 @@
 
 		const UL=0;
 		const EXTJS=1;
-		const EXTJSTABLE=2;
+		const EXTJSADV=2;
 		
 		/**
 		 * Конструктор.
@@ -36,10 +36,7 @@
 			switch ($tplType) {
 				case TreeTpl::UL: parent::__construct(VCROOT."/Templates/tree.tpl", $cache, $dir); break;
 				case TreeTpl::EXTJS: parent::__construct(VCROOT."/Templates/extJSTree.tpl", $cache, $dir); break;
-				case TreeTpl::EXTJSTABLE: 
-					parent::__construct(VCROOT."/Templates/extJSTableTree.tpl", $cache, $dir); 
-					$this->provider="col";
-				break;
+				case TreeTpl::EXTJSADV:parent::__construct(VCROOT."/Templates/extJSAdvTree.tpl", $cache, $dir); break;
 				default: parent::__construct(VCROOT."/Templates/tree.tpl", $cache, $dir);
 			}
 			$this->tree=$tree;
