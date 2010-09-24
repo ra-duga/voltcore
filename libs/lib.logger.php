@@ -45,7 +45,7 @@
 	 * @param Exception $e исключение для логирования
 	 * @param string $file Файл в который писать лог
 	 */
-	function excToFile(Exception $e, $file){
+	function excToFile($e, $file){
 		$par  = "File:".$e->getFile().";";
 		$par .= "Line:".$e->getLine().";";
 		$type='debug';
@@ -55,7 +55,7 @@
 		if (method_exists($e, "getSql")){
 			$par=$e->getSql()."|".$par;
 		}
-		logToFile($e->getMessage(), $fil, $type, $par);
+		logToFile($e->getMessage(), $file, $type, $par);
 		}
 		
 	/**
@@ -68,7 +68,7 @@
 	 * @param Exception $e исключение для логирования
 	 * @param string $fil Ключ в массиве $vf["log"], соответствующий нужному файлу.
 	 */
-	function excLog(Exception $e, $fil='log'){
+	function excLog($e, $fil='log'){
 		$par  = "File:".$e->getFile().";";
 		$par .= "Line:".$e->getLine().";";
 		$type='debug';
@@ -76,7 +76,7 @@
 			$type=$e->getType();
 		}
 		if ($e instanceof SqlException){
-			$par=$e->getSql()."|".$par;
+			$par=PHP_EOL.$e->getSql().PHP_EOL."|".$par;
 		}
 		logMsg($e->getMessage(), $type, $fil, $par);
 	}
