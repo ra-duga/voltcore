@@ -560,7 +560,7 @@
 			if (!$this->nameTable || !$this->nameField) throw new FormatException("Недостаточно данных.","Указаны не все данные");
 
 			$idChild=$this->getIdByName($id, $haveNames);
-			if($idChild==$this-rootId) return $this-rootId;
+			if($idChild==$this->rootId) return $this->rootId;
 			
 			$select=$this->getSelectParent($idChild);
 			$pid=$this->DB->getVal($select);

@@ -47,8 +47,8 @@
 		 * @param Exception $previous Исключение вызвавшее текущее исключени
 		 */
 		public function __construct($mes, $type, $sql, $code=0, Exception $previous = NULL){
-			parent::__construct($mes,$type,$code, $previous);
 			$this->sql=$sql;
+			parent::__construct($mes,$type,$code, $previous);
 		}
 		
 		public function getSql(){
