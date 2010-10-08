@@ -58,14 +58,7 @@
 		 * @param array $a Аргументы.
 		 */
 		public function __call($n, $a){
-			$this->logErrorCall($n);
-			if (strpos($n, 'prepare')===0){
-				$this->callTpl();
-				return;
-			}
-			else{
-				return $this->callInfo();			
-			}
+			throw new FormatException("Не должно быть вызова несуществующего метода!","Ошибка кодирования");
 		}
 		
 		/**
@@ -76,7 +69,13 @@
 		protected function callInfo($chto=null){
 			$chto=$chto ? $chto : $this->defaultPage;
 			$method="set".ucfirst($chto)."Info";
-			return $this->$method();
+			if (method_exists($this, $method)){
+				return $this->$method();
+			}else{
+				$this->logErrorCall($method);
+				$method="set".ucfirst($this->defaultPage)."Info";
+				return $this->$method();			
+			}
 			
 		}	
 
@@ -88,7 +87,13 @@
 		protected function callTpl($chto=null){
 			$chto=$chto ? $chto : $this->defaultTpl;
 			$method="prepare".ucfirst($chto)."Tpl";
-			return $this->$method();
+			if (method_exists($this, $method)){
+				return $this->$method();
+			}else{
+				$this->logErrorCall($method);
+				$method="prepare".ucfirst($this->defaultTpl)."Tpl";
+				$this->$method();
+			}
 		}	
 		
 	}

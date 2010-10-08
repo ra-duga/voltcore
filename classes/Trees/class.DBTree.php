@@ -530,7 +530,7 @@
 			$DB=$this->DB;
 			try{
 				$idChild=$this->getIdByName($id,$haveNames);
-				if ($idChild==$this-rootId) throw new FormatException('Нельзя удалить корень дерева','Неверные данные');
+				if ($idChild==$this->rootId) throw new FormatException('Нельзя удалить корень дерева','Неверные данные');
 				
 				if ($this->orderField){
 					$oldParent=$this->getParent($idChild);

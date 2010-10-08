@@ -195,7 +195,7 @@
 		 */
 		public function selectOrInsert($fields){ 
 			$this->select($fields);
-			if ($this->id==-1){
+			if (!$this->exists()){
 				$this->fields=$fields;
 				$this->insert();
 			}								
