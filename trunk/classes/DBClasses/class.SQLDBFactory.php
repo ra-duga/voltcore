@@ -112,6 +112,7 @@
 		public static function unsetDB($key=null){
 			if ($key==null) 
 				$key=self::$curKey!=-1 ? self::$curKey : self::$alterKey;
+			if ($key instanceof SQLDB) $key=$key->getId();
 			if (!is_string($key) || !array_key_exists($key,self::$arrInst)) throw new FormatException("Неверный формат ключа", "Неверный тип данных");
 			
 			//Если уничтожается альтернативное подключение
