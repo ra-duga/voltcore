@@ -73,15 +73,15 @@
 			return $num+1;
 		}
 		
-		protected function getAddInsert($idChild, $idParent){
-			return array("insert into $this->table($this->idField, $this->idParField) values ($idChild, $idParent)");
+		protected function doAddInsert($idChild, $idParent, $orderNum=null){
+			$this->DB->insert("insert into $this->table($this->idField, $this->idParField) values ($idChild, $idParent)");
 		}
 		
 		protected function getSelectParent($idChild){
 			return "select $this->idParField from $this->table where $this->idField=$idChild";
 		}
 				
-		protected function doChangePar($idChild, $idParent){
+		protected function doChangePar($idChild, $idParent, $orderNum=null){
 			$this->DB->update("update $this->table set $this->idParField=$idParent where $this->idField=$idChild");
 		}
 	
