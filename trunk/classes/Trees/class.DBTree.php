@@ -65,6 +65,19 @@
 		const MOVE_UP=1;
 		
 		/**
+		 * Сортировать по возрастанию.
+		 * @var int
+		 */
+		const SORT_ASC=0;
+
+		/**
+		 * Сортировать по убыванию.
+		 * @var int
+		 */
+		const SORT_DESC=1;
+		
+		
+		/**
 	 	 * Таблица, в которой лежит дерево.
 	 	 * @var string
 	 	 */
@@ -111,7 +124,70 @@
 		 * @var SQLDB
 		 */
 		protected $DB;
+		
+		/**
+		 * По какому полю сортировать.
+		 * @var string
+		 */
+		static protected $sort;
+		
+		/**
+		 * Как сортировать. 
+		 * @var int
+		 */
+		static protected $direction;
 	
+		/**
+		 * Сравнивает узлы дерева.
+		 * 
+		 * @param array $a Первый узел.
+		 * @param array $b Второй узел.
+		 * @return int 	 0 - если узлы равны по сортировочному параметру,
+		 * 				-1 - если узел $a находится раньше узла $b,
+		 * 				 1 - если узел $a находится позже узла $b.
+		 */
+		protected static function compareLeafs($a,$b){
+			$f=self::$sort;
+			if($a[$f]==$b[$f]){
+				return 0;
+			}elseif($a[$f]>$b[$f]){
+				if (self::$direction==DBTree::SORT_ASC){
+					return 1;
+				}else{
+					return -1;
+				}
+			}else{
+				if (self::$direction==DBTree::SORT_ASC){
+					return -1;
+				}else{
+					return 1;
+				}
+			}
+			return $rez;
+		}
+		
+		/**
+		 * Сортирует дерево.
+		 * 
+		 * @param array $tree Массив с деревом.
+		 * @param string $field Поле, по которому идет сортировка.
+		 * @param string $direction Поле, по которому идет сортировка.
+		 * @return array Отсортированное дерево.
+		 */
+		public static function sortTree($tree, $field='name', $direction=DBTree::SORT_ASC){
+			self::$sort=$field;
+			self::$direction=$direction;
+			if (!is_array($tree)) logVar($tree);
+			if(!count($tree)) return;
+			foreach($tree as $k=>$subTree){
+			    if($subTree['tree']){
+      				$tree[$k]['tree']=DBTree::sortTree($subTree['tree'], $field, $direction);
+  				}
+			}
+			usort($tree,array('DBTree', 'compareLeafs'));
+			return $tree;
+		} 
+		
 		/**
 		 * Конструктор.
 		 * 
@@ -166,13 +242,14 @@
 		abstract protected function getFamilyNextNum($idParent);
 		
 		/**
-		 * Возвращает запросы для вставки нового листа в дерево.
+		 * Выполняет запросы для вставки нового листа в дерево.
 		 *
 		 * @param int $idChild Идентификатор того, у кого меняем родителя.
 		 * @param int $idParent Идентификатор нового родителя.
+		 * @param int $orderNum Номер вставляемого узла по-порядку для сортировки.
 		 * @return array Запросы для вставки нового листа в дерево.
 		 */
-		abstract protected function getAddInsert($idChild, $idParent);
+		abstract protected function doAddInsert($idChild, $idParent, $orderNum=null);
 
 		/**
 		 * Возвращает запрос для нахождения непосредственного родителя.
@@ -190,7 +267,7 @@
 		 * @param int $orderNum Номер вставляемого узла по-порядку для сортировки.
 		 * @throws SqlException При ошибке работы с базой.
 		 */
-		abstract protected function doChangePar($idChild, $idParent);
+		abstract protected function doChangePar($idChild, $idParent, $orderNum=null);
 
 		/**
 		 * Выполняет запросы для удаления поддерева.
@@ -277,6 +354,7 @@
 		 * @throws SqlException При ошибке работы с базой.
 		 */
 		public function getOrderNum($id){
+			if (!$this->nameTable || !$this->idNameField || !$this->orderField) throw new FormatException("Недостаточно данных.","Указаны не все данные");
 			$orderNum=$this->DB->getVal("select $this->orderField from $this->nameTable where $this->idNameField=$id");
 			return intval($orderNum);
 		}
@@ -394,10 +472,7 @@
 					$idChild=$this->insertChild($idChild,$idParent,$orderNum);
 				}
 
-				$insert=$this->getAddInsert($idChild, $idParent);
-				foreach($insert as $query){
-					$DB->insert($query);
-				}
+				$insert=$this->doAddInsert($idChild, $idParent, $orderNum);
 				
 				$DB->commit();
 			}catch(SqlException $e){
@@ -457,8 +532,6 @@
 		 * @param int $haveNames Определяет, какие параметры считать именами.
 		 */
 		public function moveNode($id, $positions=1, $direction=DBTree::MOVE_DOWN, $haveNames=DBTree::NO_NAME){
-			if (!$this->nameTable || !$this->nameField || !$this->orderField) throw new FormatException("Недостаточно данных.","Указаны не все данные");
-			
 			$idChild=$this->getIdByName($id, $haveNames);
 			$oldNum=$this->getOrderNum($idChild);
 			if ($direction==DBTree::MOVE_UP){
@@ -482,7 +555,6 @@
 		 */
 		public function changePar($id, $parId, $haveNames=DBTree::NO_NAME, $orderNum=null){
 			if ($haveNames!=DBTree::NO_NAME && (!$this->nameTable || !$this->nameField)) throw new FormatException("Недостаточно данных.","Указаны не все данные");
-			if ($this->orderField && (!$this->nameTable || !$this->nameField || !$this->orderField)) throw new FormatException("Недостаточно данных.","Указаны не все данные");
 			$DB=$this->DB;
 			try{
 				$idChild=$this->getIdByName($id, $haveNames);
@@ -507,7 +579,7 @@
 					$this->DB->update("update $this->nameTable set $this->orderField=$sorder where $this->idNameField=$idChild");
 				}
 				
-				$this->doChangePar($idChild, $idParent);
+				$this->doChangePar($idChild, $idParent,$orderNum);
 				
 				
 				$DB->commit();

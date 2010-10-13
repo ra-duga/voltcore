@@ -117,7 +117,7 @@
 	 * @param array $maspar Дополнительные данные которые надо приписать к сообщению.
 	 * @return string Если $return=true, то возвращается строка вида $name." => ".var_dump($var);
 	 */
-	function logVar($name, $var, $return=false, $type='debug', $masPar=null){
+	function logVar($var, $name='par', $return=false, $type='debug', $masPar=null){
 		ob_start();
 			var_dump($var);
 		$msg=ob_get_clean();

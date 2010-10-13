@@ -938,6 +938,7 @@
 					$arr=$this->sortTree->getTree();
 				}else{
 					$arr=$this->tree->getTree();
+ 					$arr=DBTree::sortTree($arr);
 				}
  			}
 	 		parent::check($arr, $right, $title);
@@ -1209,7 +1210,7 @@
 			
 	 		$this->tree->add(2,1);
 	 		$this->check(null, $this->rightTrees["add"][0], "Добавление по id", true);
-
+	 		
 	 		try{
 	 			$this->tree->add(3,80);
 	 			$this->check(null, $this->rightTrees["add"][0], "Попытка создать связь c несуществующим узлом", true);
@@ -1277,8 +1278,9 @@
 	 			
 	 			$this->printEnd($this->header);
 			}catch(TestException $e){
-	 			$this->printEnd($this->header);
-	 		}
+				$this->printEnd($this->header);
+//	 		die();
+			}
 	 		$this->deleteTables();
 	 	}
 	 	

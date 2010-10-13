@@ -191,8 +191,8 @@
 			if ($rez==$right){
 				$this->printText($title." => <span class='ok'>Успешно</span>");
 			}else{
-				$textRez=logVar("rez", $rez, true);
-				$textRight=logVar("right", $right, true);
+				$textRez=logVar($rez, "rez", true);
+				$textRight=logVar($right,"right",  true);
 				$this->printText("<span class='testTitle'>$title</span> => <span class='err'>Ошибка</span>");
 				$this->printText("<p class='rez'>Получилось</p>");
 				$this->printText("<pre>$textRez</pre>");
