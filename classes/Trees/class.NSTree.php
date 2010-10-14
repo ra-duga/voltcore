@@ -123,16 +123,20 @@
 			list($left, $right, $lev)=$this->getNode($idChild);
 			
 			$delta=$right-$left+1;
+			//Находим идентификаторы перемещаемого узла и потомков, чтобы исключить их из коллапса и расширения.
 			$ids=$this->DB->getColumn("select $this->idField from $this->table where $this->leftField>=$left and $this->rightField<=$right");
 			$ids="(".implode(',', $ids).")";
 			
+			//"Убираем" элемент из дерева (схлопываем дерево).
 			$this->prepareTree($left, $right, $delta, NSTree::COLLAPSE);
 			
 			list($parLeft, $parRight, $parLev)=$this->getNode($idParent);
 
+			//Находим куда "вставлять" элемент и раздвигаем дерево.
 			$childLeft=$this->getBorderByNum($orderNum, $parLeft, $parRight, $parLev);
 			$childLeft=$this->prepareTree($childLeft, null, $delta, NSTree::EXPAND, $ids);
 
+			//"Вставляем" элемент. По сути просто сдвигаем границы и изменяем уровни элемента и потомков. 
 			$moveDelta=$left-$childLeft;
 			$levelDelta=$lev-$parLev-1;
 			$this->DB->update("update $this->table set $this->leftField=$this->leftField-($moveDelta), $this->rightField=$this->rightField-($moveDelta), $this->levelField=$this->levelField-($levelDelta) where $this->idField in $ids");
@@ -236,21 +240,24 @@
 			list($left, $right, $lev)=$this->getNode($idChild);
 			list($pLeft, $pRight, $pLev)=$this->getParentNode($idChild);
 			
+			//Находим идентификаторы перемещаемого узла и потомков, чтобы исключить их из перемещения.
 			$delta=$right-$left+1;
 			$ids=$this->DB->getColumn("select $this->idField from $this->table where $this->leftField>=$left and $this->rightField<=$right");
 			$ids="(".implode(',', $ids).")";
 			
 			$newOrder=intval($orderNum);
-			if ($newOrder<1){
+			if ($newOrder<1){ //Если перемещаем в конец
 				$childRight=$pRight-1;
 				$childLeft=$childRight-$delta+1;
-			}elseif($newOrder==1){
+			}elseif($newOrder==1){ //Если перемещаем в начало
 				$childLeft=$pLeft+1;
 				$childRight=$childLeft+$delta-1;
 			}else{
+				//Выбор всех братьев.
 				$this->DB->select("select $this->leftField as lf, $this->rightField as rf, $this->levelField as lev from $this->table as tree 
 					where $pLeft<=tree.$this->leftField and $pRight>=tree.$this->rightField and $pLev=tree.$this->levelField-1 order by $this->leftField");
 			
+				//Определяем правую и левую границу брата, занимающего нужный нам порядковый номер.
 				$i=1;
 				$tLeft=$pLeft;	
 				$tRight=$pRight;
@@ -269,7 +276,7 @@
 					if ($i==1){ //Если родитель без потомков
 						$childLeft=$tRight-$delta;
 						$childRight=$tRight-1;
-					}else{
+					}else{ //Если элементов менгше чем указанные номер
 						$childLeft=$tLeft;
 						$childRight=$tRight;
 					}
@@ -277,12 +284,12 @@
 			}
 			
 			$moveDelta=0;
-			if($left-$childLeft>0){
-				$moveDelta=$left-$childLeft;
+			if($left-$childLeft>0){ //Если сдвигаем справа налево...
+				$moveDelta=$left-$childLeft; // ...то найденная левая граница брата станет новой левой границей элемента.
 				if($moveDelta==0) return;
 				$this->DB->update("update $this->table set $this->leftField=$this->leftField+$delta, $this->rightField=$this->rightField+$delta where $this->rightField<$left and $this->leftField>=$childLeft and $this->idField not in $ids");
-			}else{
-				$moveDelta=$right-$childRight;
+			}else{ //Если сдвигаем слева направо...
+				$moveDelta=$right-$childRight; // ...то найденная правая граница брата станет новой правой границей элемента
 				if($moveDelta==0) return;
 				$this->DB->update("update $this->table set $this->leftField=$this->leftField-$delta, $this->rightField=$this->rightField-$delta where $this->leftField>$right and  $this->rightField<=$childRight and $this->idField not in $ids");
 			}
@@ -337,23 +344,32 @@
 		protected function prepareTree($left, $right, $delta, $direction=NSTree::EXPAND, $ids=null){
 			$center=$this->getCenter();
 			
+			/*От направления зависит последовательность комманд update*/
 			if ($direction==NSTree::EXPAND){
 				$andWhere=$ids ? "and $this->idField not in $ids" : '';
 				if ($left>=$center){
+					//Сдвигаем все узлы, которые находятся справа от нужной точки вправо. 
 					$this->DB->update("update $this->table set $this->leftField=$this->leftField+$delta, $this->rightField=$this->rightField+$delta where $this->leftField>=$left $andWhere");
+					//Расширяем область предков за счет смещения правой границы. 
 					$this->DB->update("update $this->table set $this->rightField=$this->rightField+$delta where $this->leftField<$left and $this->rightField>=$left $andWhere");
 				}else{
+					//Сдвигаем все узлы, которые находятся слева от нужной точки влево. 
 					$this->DB->update("update $this->table set $this->leftField=$this->leftField-$delta, $this->rightField=$this->rightField-$delta where $this->rightField<$left $andWhere");
+					//Расширяем область предков за счет смещения левой границы. 
 					$this->DB->update("update $this->table set $this->leftField=$this->leftField-$delta where $this->leftField<$left and $this->rightField>=$left $andWhere");
 					$left=$left-$delta;
 				}
 				return $left;
 			}else{	
 				if ($right>=$center){
+					//Сжимаем область предков за счет смещения правой границы. 
 					$this->DB->update("update $this->table set $this->rightField=$this->rightField-$delta where $this->leftField<$left and $this->rightField>$right");
+					//Сдвигаем все узлы, которые находятся справа от нужной точки влево. 
 					$this->DB->update("update $this->table set $this->leftField=$this->leftField-$delta, $this->rightField=$this->rightField-$delta where $this->leftField>$right");
 				}else{
+					//Сжимаем область предков за счет смещения левой границы. 
 					$this->DB->update("update $this->table set $this->leftField=$this->leftField+$delta where $this->leftField<$left and $this->rightField>$right");
+					//Сдвигаем все узлы, которые находятся слева от нужной точки вправо. 
 					$this->DB->update("update $this->table set $this->leftField=$this->leftField+$delta, $this->rightField=$this->rightField+$delta where $this->rightField<$left");
 				}
 			}
