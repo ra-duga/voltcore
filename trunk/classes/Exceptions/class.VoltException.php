@@ -4,8 +4,7 @@
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
 	 * @version 1.0
-	 * @package classes
-	 * @subpackage exceptions
+	 * @package Exceptions
 	 */
 	
 	/**
@@ -16,8 +15,7 @@
 	 * @author Костин Алексей Васильевич aka Volt(220)
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
-	 * @package classes
-	 * @subpackage exceptions
+	 * @package Exceptions
 	 */
 	class VoltException extends Exception{
 		
@@ -55,7 +53,7 @@
 			global $vf;
 			parent::__construct($mes, $code);
 			$this->type=$type;
-			if ($vf["exc"]["excLog"] && $vf["exc"][$this->logType]){
+			if ($vf["exc"]["excLog"] && $vf["exc"][get_class($this)]){
 				$this->log();
 			}
 		}
@@ -72,7 +70,6 @@
 		 * Логирует исключение 
 		 */
 		protected function log(){
-			excLog($this, $this->logFile);
+			excLog($this);
 		}
 	}
-?>

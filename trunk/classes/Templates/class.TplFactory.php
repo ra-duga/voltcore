@@ -4,8 +4,7 @@
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
  	 * @version 1.0
-	 * @package classes
-	 * @subpackage Templates
+	 * @package Templates
 	 */
 
 	/**
@@ -16,8 +15,7 @@
 	 * @author Костин Алексей Васильевич aka Volt(220)
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
-	 * @package classes
-	 * @subpackage templates
+	 * @package Templates
 	 */
 	abstract class TplFactory{   
 

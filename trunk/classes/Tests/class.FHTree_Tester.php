@@ -4,15 +4,15 @@
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
 	 * @version 1.0
-	 * @package tests
-	 * @subpackage trees
+	 * @package Tests
+	 * @subpackage Trees
 	 */
 	
 	/**
 	 * Класс для тестирования деревьев RAL(FH).
 	 *  
-	 * @package tests
-	 * @subpackage trees
+	 * @package Tests
+	 * @subpackage Trees
 	 */
 	 class FHTree_Tester extends DBTree_Tester{
 	 	

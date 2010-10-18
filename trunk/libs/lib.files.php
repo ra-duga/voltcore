@@ -8,8 +8,7 @@
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
 	 * @version 1.0
-	 * @package voltcore
-	 * @subpackage libs
+	 * @package libs
 	 */
 
 	/**
@@ -90,4 +89,16 @@
 		$rez=glob($pattern);
 		return  $rez ? $rez : array();
 	}
-?>
+	
+	/**
+	 * Создает путь до файла $file. 
+	 * 
+	 * @param string $file Адрес файла для которого создаются дирректории. 
+	 */
+	function makeDirs($file){
+		if (!file_exists(dirname($file))){
+			if (!mkdir(dirname($file), 0777, true)){
+				throw FormatException("Не удалось создать дирректории","Некуда записывать");
+			}
+		}
+	}

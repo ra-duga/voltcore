@@ -17,7 +17,7 @@
 	 * Предполагается что классы лежат в файлах типа class.name.php, где name имя класса.
 	 * 
 	 * @param string $dir Директория сканирования.
-	 * @param array $allFiles Результат сканирования.
+	 * @param array &$allFiles Результат сканирования.
 	 */
 	function scanFiles($dir, &$allFiles) {
 		if (!is_dir($dir)) return;
@@ -46,7 +46,7 @@
 	 * 
 	 * @param array $dirs Результирующий массив файлов
 	 */
-	function makeDirs(){
+	function makeLoadingArray(){
 		global $vf;
 		$dirs=getFromCache('vfClasses');
 		if (!is_null($dirs)){
@@ -72,7 +72,7 @@
 		static $dirs = false;
  
 		if(!$dirs) {
-			$dirs=makeDirs();
+			$dirs=makeLoadingArray();
 		}
 		
 		$classname = strtolower($class);

@@ -9,8 +9,7 @@
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
 	 * @version 1.5
-	 * @package voltcore
-	 * @subpackage libs
+	 * @package libs
 	 */
 
 
@@ -28,6 +27,9 @@
 	 */
 	function logToFile($mes, $file, $type='debug', $masPar=null){
 		global $vf;
+		
+		makeDirs($file);
+		
 		if (is_array($masPar)) {
 			$masPar=implode("|",$masPar);
 		}
@@ -55,6 +57,7 @@
 		if (method_exists($e, "getSql")){
 			$par=$e->getSql()."|".$par;
 		}
+		
 		logToFile($e->getMessage(), $file, $type, $par);
 		}
 		
@@ -68,7 +71,8 @@
 	 * @param Exception $e исключение для логирования
 	 * @param string $fil Ключ в массиве $vf["log"], соответствующий нужному файлу.
 	 */
-	function excLog($e, $fil='log'){
+	function excLog($e){
+		global $vf;
 		$par  = "File:".$e->getFile().";";
 		$par .= "Line:".$e->getLine().";";
 		$type='debug';
@@ -78,6 +82,14 @@
 		if ($e instanceof SqlException){
 			$par=PHP_EOL.$e->getSql().PHP_EOL."|".$par;
 		}
+		$fil=get_class($e);
+		if(!in_array($fil, $vf['log'])){
+			$fil=get_parent_class($e);
+		}
+		if(!in_array($fil, $vf['log'])){
+			$fil='log';
+		}
+		
 		logMsg($e->getMessage(), $type, $fil, $par);
 	}
 		
@@ -100,6 +112,9 @@
 		}
 		$logText=$mes."|".$type."|".$masPar."|".date("d-m-Y H:i:s")."\r\n";
 		$logFile=$vf["log"][$fil];
+		
+		makeDirs($logFile);
+		
 		file_put_contents($logFile, $logText, FILE_APPEND);
 	}
 	
