@@ -3,21 +3,23 @@
 	 * @author Костин Алексей Васильевич aka Volt(220)
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
-	 * @version 1.0
-	 * @package Exceptions
+ 	 * @version 1.0
+	 * @package User
+	 * @subpackage Rights
 	 */
-	
+
 	/**
-	 * Класс исключения при тестировании.
-	 *  
+	 * Класс стратегии "все разрешить".
+	 * 
 	 * @author Костин Алексей Васильевич aka Volt(220)
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
-	 * @package Exceptions
+	 * @package User
+	 * @subpackage Rights
 	 */
-	class TestException extends VoltException{
-
-		public function __construct($mes, $type, $code=0, Exception $previous = NULL){
-			parent::__construct($mes,$type,$code, $previous);
+	class AdminRights implements UserRights{
+		
+		public function may($action, $params=null){
+				return true;
 		}
 	}

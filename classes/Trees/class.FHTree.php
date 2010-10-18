@@ -4,8 +4,8 @@
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
 	 * @version 2.0
-	 * @package classes
-	 * @subpackage Trees
+	 * @package Trees
+	 * @subpackage Adapters
 	 */
 	
 	/**
@@ -17,8 +17,8 @@
 	 * 3)У узла создается запись для каждого родителя с указанием уровня (первый родитель - 1, родитель родителя - 2 и т.д.).
 	 * 4)Каждый узел, кроме корня, имеет как минимум 2 записи - ссылка на себя с уровнем 0 и ссылка на корневой элемент. 
 	 * 
-	 * @package classes
-	 * @subpackage Trees
+	 * @package Trees
+	 * @subpackage Adapters
 	 */
 	class FHTree extends DBTree{
 

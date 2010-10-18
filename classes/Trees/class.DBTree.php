@@ -4,8 +4,7 @@
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
 	 * @version 2.0
-	 * @package classes
-	 * @subpackage Trees
+	 * @package Trees
 	 */
 	
 	/**
@@ -22,8 +21,7 @@
 	 * @author Костин Алексей Васильевич aka Volt(220)
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
-	 * @package classes
-	 * @subpackage Trees
+	 * @package Trees
 	 * @abstract
 	 */
 	abstract class DBTree{

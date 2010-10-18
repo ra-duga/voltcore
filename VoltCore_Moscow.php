@@ -51,19 +51,33 @@
 	 */
 	require_once(VCROOT."/autoload.php");
 
+	if (!defined("DOCROOT")){
+		/**
+		 * Корень модуля.
+		 * @var string 
+		 */
+		define("DOCROOT",SITEROOT);
+	}
+	
 	if (!defined("LOGDIR")){
 		/**
 		 * Директория логов.
-		 * 
 		 * @var string 
 		 */
 		define("LOGDIR",DOCROOT);
+	}
+
+	if (!defined("EVENTDIR")){
+		/**
+		 * Директория логов событий.
+		 * @var string 
+		 */
+		define("EVENTDIR",LOGDIR."/events");
 	}
 	
 	if (!defined("LOG_PREFIX")){
 		/**
 		 * Префикс файлов логов.
-		 * 
 		 * @var string 
 		 */
 		define("LOG_PREFIX","/");
@@ -71,7 +85,6 @@
 	if (!defined("ERR_LOG_LEVEL")){
 		/**
 		 * Уровень ошибок для логирования.
-		 * 
 		 * @var int
 		 */
 		define("ERR_LOG_LEVEL",0);
@@ -98,18 +111,20 @@
 	$vf["log"]["sqlLog"]=LOGDIR.LOG_PREFIX."sql.log";			// Файл SQL логов
 	$vf["log"]["log"]=LOGDIR.LOG_PREFIX."runtime.log";			// Файл сообщений(ошибок) возникших в ходе выполнения программы
 	$vf["log"]["mailLog"]=LOGDIR.LOG_PREFIX."mail.log";			// Файл сообщений(ошибок) возникших при работе с почтой
-	$vf["log"]["excLog"]=LOGDIR.LOG_PREFIX."exceptions.log";	// Файл сообщений(ошибок) о возникших исключениях
-	$vf["log"]["formatExcLog"]=LOGDIR.LOG_PREFIX."exceptions.log";	// Файл сообщений(ошибок) о возникших FormatException исключениях
-	$vf["log"]["testExcLog"]=LOGDIR.LOG_PREFIX."exceptions.log";	// Файл сообщений(ошибок) о возникших TestException исключениях
+	$vf["log"]["Exception"]=LOGDIR.LOG_PREFIX."exceptions.log";	// Файл сообщений(ошибок) о возникших исключениях
+	$vf["log"]["VoltException"]=LOGDIR.LOG_PREFIX."exceptions.log";	// Файл сообщений(ошибок) о возникших VoltException исключениях
+	$vf["log"]["FormatException"]=LOGDIR.LOG_PREFIX."exceptions.log";	// Файл сообщений(ошибок) о возникших FormatException исключениях
+	$vf["log"]["TestException"]=LOGDIR.LOG_PREFIX."exceptions.log";	// Файл сообщений(ошибок) о возникших TestException исключениях
+	$vf["log"]["SqlException"]=LOGDIR.LOG_PREFIX."sql.log";	// Файл сообщений(ошибок) о возникших SqlException исключениях
 	$vf["log"]["debug"]=LOGDIR.LOG_PREFIX."debug.log";			// Файл отладочной информации
-	$vf["log"]["var"]=DOCROOT."/var.log";						// Файл с залогированными переменными 
+	$vf["log"]["var"]=LOGDIR.LOG_PREFIX."/var.log";						// Файл с залогированными переменными 
 	
 	//Настройки исключений
 	$vf["exc"]["excLog"]=true;				// Логировать ли исключения
-	$vf["exc"]["sqlExcLog"]=true;			// Логировать ли SqlException
-	$vf["exc"]["formatExcLog"]=true;		// Логировать ли FormatException
-	$vf["exc"]["testExcLog"]=false;			// Логировать ли TestException
-	$vf["exc"]["voltExcLog"]=true;			// Логировать ли VoltException
+	$vf["exc"]["SqlException"]=true;		// Логировать ли SqlException
+	$vf["exc"]["FormatException"]=true;		// Логировать ли FormatException
+	$vf["exc"]["TestException"]=false;		// Логировать ли TestException
+	$vf["exc"]["VoltException"]=true;		// Логировать ли VoltException
 	
 	//Стандартные дирректории
 	$vf["dir"]["js"]=DOCROOT."/js";			// Дирректория с javascript файлами
@@ -121,7 +136,10 @@
 	$vf['dir']['classes'][]=VCROOT."/classes";	// Массив дирректорий из которых автолоад должен составить список классов.
 	
 	$vf["tpl"]["needCache"]=false;			// Кшировать ли шаблоны
-		
+
+	//Настройки безопасности.
+	$vf['security']['userRights']='1';		//Стратегия прав пользователей по умолчанию (0 - запрещать все, 1 - все разрешать)
+	
 	$vf["cache"]["defType"]="file";			// Куда кэшировать по умолчанию. (file)
 	
 	$vf["test"]["db"]="VoltCore_Test";		//Имя базы данных для самотестирования.

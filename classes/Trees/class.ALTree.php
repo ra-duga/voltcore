@@ -4,8 +4,8 @@
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
 	 * @version 2.0
-	 * @package classes
-	 * @subpackage Trees
+	 * @package Trees
+	 * @subpackage Adapters
 	 */
 	
 	/**
@@ -15,8 +15,8 @@
 	 * 1)Существует корневой элемент. 
 	 * 2)Корневой элемент ссылается на себя как на родителя. 
 	 * 
-	 * @package classes
-	 * @subpackage Trees
+	 * @package Trees
+	 * @subpackage Adapters
 	 */
 	class ALTree extends DBTree{
 

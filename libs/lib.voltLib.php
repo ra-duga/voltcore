@@ -8,8 +8,7 @@
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
 	 * @version 1.0
-	 * @package voltcore
-	 * @subpackage libs
+	 * @package libs
 	 */
 
 	/**
@@ -107,5 +106,4 @@
 		}
 		preg_match("#(\d{1,2}).(\d{1,2}).(\d{4})\s(\d{1,2}).(\d{1,2}).(\d{1,2})#", $fullDate, $matches);
 		return mktime($matches[6],$matches[5],$matches[4], $matches[2], $matches[1], $matches[3]);
-	} 
-?>
+	}
