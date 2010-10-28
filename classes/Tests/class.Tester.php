@@ -39,9 +39,11 @@
 		 * @param bool $print Выводить ли информацию на экран или писать в логи.
 		 * @param SQLDB $db Объект для работы с БД.
 		 */
-		static public function startTesting($arrClasses, $print=false, $db){
+		static public function startTesting($arrClasses, $print=false, $db=null){
 			Tester::$logFile=VCROOT."/reports/test_".date("d-m-Y_H-i").".log";
-			self::createDB($db);
+			if ($db){
+				self::createDB($db);
+			}
 			foreach($arrClasses as $class){
 				$tester=$class."_Tester";
 				$obj=new $tester($print, $db);
