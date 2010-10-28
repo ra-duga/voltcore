@@ -20,8 +20,22 @@
 
 	class TreeTpl extends Template{
 
+		/**
+		 * Обычный список.
+		 * @var int
+		 */
 		const UL=0;
+
+		/**
+		 * ExtJs дерево.
+		 * @var int
+		 */
 		const EXTJS=1;
+
+		/**
+		 * ExtJs дерево в таблице или ExtJs дерево с дополнительными параметрами.
+		 * @var int
+		 */
 		const EXTJSADV=2;
 		
 		/**

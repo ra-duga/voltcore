@@ -186,6 +186,7 @@
 		public function setStatus($status){
 			switch ($status){
 				case SingleProcess::WORK_STATUS:
+					makeDirs($this->workFile);
 					file_put_contents($this->workFile,"");
 					break;
 				case SingleProcess::STOP_STATUS:
@@ -198,12 +199,11 @@
 		
 		/**
 		 * Логирует ход работы процесса.
+		 * 
 		 * @param string $msg Сообщение которое нужно залогировать.
 		 */
 		protected function logProgress($msg){
-			if ($this->needLogProgress){
-				logToFile($msg, $this->progressFile);
-			}
+			logToFile($msg, $this->progressFile);
 		}
 		
 		/**

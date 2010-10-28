@@ -1257,9 +1257,7 @@
 	 	}
 	 	
 		public function goTest(){
-	 		if ($this->print){
 	 			$this->printHeader($this->header);
-	 		}
 				$this->createTables();
 	 			$this->setRightTree();
 			try{

@@ -31,6 +31,7 @@
 		 * @return bool true - если действие может быть выполнено, false - в противном случае.
 		 */
 		protected function checkRights(){
+			global $vf;
 			return $vf['security']['userRights']==UserRights::ALLOW;
 		}
 		
