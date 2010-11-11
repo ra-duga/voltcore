@@ -38,7 +38,7 @@
 			global $vf;
 			parent::__construct($mes, $code);
 			$this->type=$type;
-			if ($vf["exc"]["excLog"] && $vf["exc"][get_class($this)]){
+			if ($vf["exc"]["excLog"] && (!isset($vf["exc"][get_class($this)]) || $vf["exc"][get_class($this)])){
 				$this->log();
 			}
 		}
