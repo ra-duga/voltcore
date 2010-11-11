@@ -22,10 +22,9 @@
 		
 		/**
 		 * Объект для работы с БД.
-		 * @var object
+		 * @var SQLDB
 		 */
 		protected $db;
-		
 		
 		/**
 		 * Имя таблицы, из которой беруться записи. 
@@ -51,26 +50,39 @@
 		 */
 		protected $emptyFields=array("id"=>-1);
 		
+		/**
+		 * Какой идентификатор использовать, тот который генерирует база(true) или пользователь(false) 
+		 * @var bool
+		 */
+		protected $useDatabaseId;
+		
+		/**
+		 * Какого типа поле идентификатора int(true) или string(false). 
+		 * @var bool
+		 */
+		protected $useIntId;
 		
 		/**
 		 * Конструктор.
 		 * 
 		 * @param string $table Имя таблицы, из которой беруться записи.
-		 * @param mixed $id Если задан этот параметр, то запись инициализируется строчкой из таблицы с соответствующим идентификатором.
+		 * @param mixed $id Если задан этот параметр, то запись инициализируется соответствующей строчкой из таблицы.
+		 * 				Если это строка или число, то считается идентификатором записи.
+		 * 				Если это массив, то ключи - имена полей, значения - значения полей. 
+		 * 				По сути $id передается в {@link Zapis::select()}
 		 * @param string $idField Имя поля идентификатора.
-		 * @param object $db Объект для работы с БД.
+		 * @param SQLDB $db Объект для работы с БД.
+		 * @param bool $useDatabaseId Какой идентификатор использовать, тот который генерирует база(true) или пользователь(false) 
+		 * @param bool $useIntId Какого типа поле идентификатора int(true) или string(false). 
 		 */
-		public function __construct($table, $id=null, $idField='id', $db=null){
-			if (is_array($id)){
-				$dbId=$id;
-			}elseif(!is_null($id)){
-				$dbId=$id+0;
-			}
+		public function __construct($table, $id=null, $idField='id', $db=null, $useDatabaseId=true, $useIntId=true){
 			$this->db=$db ? $db : SQLDBFactory::getDB(); 
 			$this->table=$table;
 			$this->idField=$idField;
+			$this->useDatabaseId=$useDatabaseId;
+			$this->useIntId=$useIntId;
 			if(!is_null($id)){
-				$this->select($dbId);
+				$this->select($id);
 			}			
 			
 		}
@@ -108,7 +120,7 @@
 		 * Подготовка с сериализации
 		 */
 		public function __sleep(){
-			return array("table", "idField", "fields", "emptyFields");
+			return array("table", "idField", "fields", "emptyFields", "useDatabaseId", "useIntId");
 		}
 		
 		/**
@@ -154,11 +166,14 @@
 		 */
 		public function insert(){
 			$fields=$this->fields;
-			if (isset($fields[$this->idField])){
+			if ($this->useDatabaseId && isset($fields[$this->idField])){
 				unset($fields[$this->idField]);
 			}
 			$newId=$this->db->insert($fields, $this->table);
-			$this->select($newId+0);
+			if ($this->useIntId){
+				$newId=(int)$newId;		
+			}
+			$this->select($newId);
 		}
 		
 		/**
@@ -166,12 +181,15 @@
 		 */
 		public function update(){
 			$fields=$this->fields;
-			if (isset($fields[$this->idField])){
-				$id=$fields[$this->idField];
+			$id=$fields[$this->idField];
+			if ($this->useDatabaseId){
 				unset($fields[$this->idField]);
 			}
 			$this->db->update($fields, $this->table, array($this->idField=>$id));
-			$fields[$this->idField]=$id;
+			if ($this->useDatabaseId){
+				$fields[$this->idField]=$id;
+			}
+			$this->select($fields[$this->idField]);
 		}
 		
 		/**
@@ -203,7 +221,7 @@
 		 * Удаляет запись из таблицы.
 		 */
 		public function delete(){
-			$this->db->delete($this->table, array($this->idField=>$this->id));
+			$this->db->delete($this->table, array($this->idField=>$this->fields[$this->idField]));
 		}
 		
 		/**
@@ -212,7 +230,7 @@
 		 * @return bool true - если объект соответствует записи в базе, false - в противном случае.
 		 */
 		public function exists(){
-			return $this->id!=-1;
+			return (bool)$this->fields && $this->id!=-1;
 		}
 		
 	}

@@ -20,7 +20,7 @@
 			
 			//TODO Сделать так, чтобы строка выполнялась и под Linux.
 			$fileAddr=str_replace("/","\\",VCROOT);
-			pclose(popen("start /B php $fileAddr\\classes\\tests\\runSingleProcessTest.php", 'r'));
+			pclose(popen("start /B php $fileAddr\\classes\\tests\\file.runSingleProcessTest.php", 'r'));
 			sleep(2);
 			$proc=new SingleProcessTest("2", new AdminRights());
 			$proc->run();
