@@ -98,7 +98,8 @@
 			if (method_exists($this, $method)){
 				return $this->$method();
 			}
-			return $this->fields[$var];
+			if (isset($this->fields[$var])) return $this->fields[$var];
+			return null;
 		}
 		
 		/**
@@ -157,6 +158,12 @@
 			$this->fields= $row ? $row : $this->emptyFields; 
 		}
 		
+		/**
+		 * Устанавливает значения по умолчанию.
+		 */
+		public function selectDefault(){
+			$this->fields=$this->emptyFields;
+		}
 		/**
 		 * Вставка записи в таблицу.
 		 * 
