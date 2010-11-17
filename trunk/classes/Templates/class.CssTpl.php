@@ -4,8 +4,9 @@
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
  	 * @version 1.0
-	 * @package Templates
-	 * @subpackage ConcreteTemplates
+	 * @category VoltCore
+	 * @package VoltCoreFiles
+	 * @subpackage Classes
 	 */
 
 	/**
@@ -14,8 +15,9 @@
 	 * @author Костин Алексей Васильевич aka Volt(220)
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
-	 * @package Templates
-	 * @subpackage ConcreteTemplates
+	 * @category VoltCore
+	 * @package VoltCoreClasses
+	 * @subpackage TemplatesConcrete
 	 */
 	class CssTpl extends InclTpl{
 

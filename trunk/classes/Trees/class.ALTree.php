@@ -4,8 +4,9 @@
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
 	 * @version 2.0
-	 * @package Trees
-	 * @subpackage Adapters
+	 * @category VoltCore
+	 * @package VoltCoreFiles
+	 * @subpackage Classes
 	 */
 	
 	/**
@@ -15,8 +16,9 @@
 	 * 1)Существует корневой элемент. 
 	 * 2)Корневой элемент ссылается на себя как на родителя. 
 	 * 
-	 * @package Trees
-	 * @subpackage Adapters
+	 * @category VoltCore
+	 * @package VoltCoreClasses
+	 * @subpackage TreeAdapters
 	 */
 	class ALTree extends DBTree{
 

@@ -4,15 +4,17 @@
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
 	 * @version 1.0
-	 * @package Tests
-	 * @subpackage Trees
+	 * @category VoltCore
+	 * @package VoltCoreFiles
+	 * @subpackage Classes
 	 */
 	
 	/**
 	 * Класс для тестирования деревьев RAL(FH).
 	 *  
-	 * @package Tests
-	 * @subpackage Trees
+	 * @category VoltCore
+	 * @package VoltCoreClasses
+	 * @subpackage TestTrees
 	 */
 	 class FHTree_Tester extends DBTree_Tester{
 	 	

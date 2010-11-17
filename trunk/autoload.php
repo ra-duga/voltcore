@@ -7,7 +7,8 @@
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
  	 * @version 1.3
-	 * @package voltcore
+	 * @category VoltCore
+	 * @package VoltCoreFiles
 	 */
  
  	/**
