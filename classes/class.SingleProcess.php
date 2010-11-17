@@ -4,7 +4,9 @@
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
  	 * @version 1.0
-	 * @package OtherClasses
+	 * @category VoltCore
+	 * @package VoltCoreFiles
+	 * @subpackage Classes
 	 */
 
 	/**
@@ -13,10 +15,9 @@
 	 * Класс позволяет реализовать схему, когда конкретный процесс(например посылка писем)
 	 * в каждый момент времени работате в единственном экземпляре.   
 	 * 
-	 * @author Костин Алексей Васильевич aka Volt(220)
-	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
-	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
-	 * @package OtherClasses
+	 * @category VoltCore
+	 * @package VoltCoreClasses
+	 * @subpackage OtherClasses
 	 */
 	abstract class SingleProcess{
 		

@@ -4,16 +4,16 @@
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
  	 * @version 1.0
-	 * @package Interfaces
+	 * @category VoltCore
+	 * @package VoltCoreFiles
+	 * @subpackage Interfaces
 	 */
 
 	/**
 	 * Интерфейс стратегии прав пользователя.
 	 * 
-	 * @author Костин Алексей Васильевич aka Volt(220)
-	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
-	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
-	 * @package Interfaces
+	 * @category VoltCore
+	 * @package VoltCoreInterfaces
 	 */
 	interface UserRights{
 		

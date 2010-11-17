@@ -4,15 +4,17 @@
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
 	 * @version 2.0
-	 * @package Trees
-	 * @subpackage Adapters
+	 * @category VoltCore
+	 * @package VoltCoreFiles
+	 * @subpackage Classes
 	 */
 	
 	/**
 	 * Класс для работы с деревом. Дерево хранится по принципу Nested Sets.
 	 * 
-	 * @package Trees
-	 * @subpackage Adapters
+	 * @category VoltCore
+	 * @package VoltCoreClasses
+	 * @subpackage TreeAdapters
 	 */
 	class NSTree extends DBTree{
 

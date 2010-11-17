@@ -4,13 +4,17 @@
 	 * @copyright Copyright (c) 2010, Костин Алексей Васильевич
 	 * @license http://www.gnu.org/licenses/gpl-3.0.html GNU Public License
 	 * @version 1.0
-	 * @package Tests
+	 * @category VoltCore
+	 * @package VoltCoreFiles
+	 * @subpackage Classes
 	 */
 	
 	/**
 	 * Класс для тестирования одиночного процеса.
 	 *  
-	 * @package Tests
+	 * @category VoltCore
+	 * @package VoltCoreClasses
+	 * @subpackage Tests
 	 */
 	class SingleProcess_Tester extends Tester{
 		
@@ -43,7 +47,9 @@
 	/**
 	 * Конкретный класс SingleProcess для тестов.
 	 * 
-	 * @package Tests
+	 * @category VoltCore
+	 * @package VoltCoreClasses
+	 * @subpackage Tests
 	 */
 	class SingleProcessTest extends SingleProcess{
 
