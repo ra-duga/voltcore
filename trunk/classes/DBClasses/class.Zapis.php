@@ -136,6 +136,28 @@
 		}
 		
 		/**
+		 * Возвращает md5 хеш записи. 
+		 * 
+		 * @return string md5 хеш записи.
+		 */
+		public function md5Fields(){
+			return md5(serialize($this->fields));
+		}
+		
+		/**
+		 * Сравнивает две записи по их хешам.
+		 * 
+		 * @param mixed $hash Другая запись или хеш другой записи.
+		 * @return true - если хеши (а значит и записи) равны, false - в противном случае.
+		 */
+		public function equalByHash($hash){
+			if ($hash instanceof Zapis){
+				$hash=$hash->md5Fields();
+			}
+			return $hash===$this->md5Fields();
+		}
+		
+		/**
 		 * Сбрасывает данные о полях записи.
 		 */
 		public function reset(){
@@ -207,7 +229,7 @@
 		 * Обновляет существующую запись или вставляет новую если запись не существует.
 		 */
 		public function insertOrUpdate(){ 
-			if ($this->id==-1){
+			if (!$this->exists()){
 				$this->insert();
 			}else{
 				$this->update();
