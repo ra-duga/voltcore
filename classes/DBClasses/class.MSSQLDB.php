@@ -286,7 +286,7 @@
 				}
 				return $str;
 			}
-			if ($str==null) return "NULL";
+			if (is_null($str)) return "NULL";
 			if (is_string($str)) {
 				$esc="'".$this->escape($str)."'";
 				if ($this->encDB=="utf-8") $esc="N".$esc;

@@ -36,8 +36,6 @@
 		/**
 		 * Ключ в массиве {@link $arrInst}. Указывает на объект соответствующий альтернативному подключению.
 		 * 
-		 * Если альтернативный объект существует, то он находится в начале массива {@link $arrInst}.
-		 * 
 		 * @var string
 		 */
 		static protected $alterKey=-1;
@@ -46,11 +44,11 @@
 		/**
 		 * Возвращает олбъект для работы с БД.
 		 * 
-		 * @throws VoltException, FormatException
 		 * @param mixed $config Конфигурационный массив
 		 * @return object Объект для работы с БД
+		 * @throws FormatException Если переданы неверные данные.
 		 */
-		public static function getDB($config=null){
+		public static function getDB($userConfig=null){
 
 			global $vf;
 			/////////////////////////////////////
@@ -58,7 +56,8 @@
 			/////////////////////////////////////
 			
 			//Если не указан конфигурационый массив
-			if (!$config){
+			$config=$userConfig;
+			if (is_null($userConfig)){
 				//если уже с чем-то работали
 				if (self::$curKey!=-1) {
 					$lastIns=self::$arrInst[self::$curKey];
@@ -70,18 +69,18 @@
 			}
 			else{			
 				//Если задана СУБД
-				if (is_string($config)){
-					$temp=$config;
+				if (is_string($userConfig)){
+					if(isset(self::$arrInst[$userConfig])) return self::$arrInst[$userConfig];
 					$config=$vf["db"];
-					$config["subd"]=$temp;
+					$config["subd"]=$userConfig;
 				}
 				//Если дано непонятно что.
-				elseif (!is_array($config)){
+				elseif (!is_array($userConfig)){
 					throw new FormatException("Неверный формат конфигурационных данных", "Неверный тип данных");
 				}
 				//Если дан массив
 				else{
-					$config=array_merge($vf["db"], $config);
+					$config=array_merge($vf["db"], $userConfig);
 				}
 			}
 			
@@ -91,7 +90,7 @@
 			switch ($config["subd"]){
 				case "mysql": $DB= new MySQLDB($config); break; 
 				case "mssql": $DB= new MSSQLDB($config); break;
-				default : throw new VoltException("Данный тип СУБД не поддерживается", "Неверная СУБД");
+				default : throw new FormatException("Данный тип СУБД не поддерживается", "Некорректные данные");
 			}
 
 			///////////////
@@ -101,7 +100,9 @@
 			$newId=uniqid();
 			$DB->setId($newId);
 			self::$arrInst[$newId]=$DB;
-			self::$curKey=$newId;
+			if (is_null($userConfig)){
+				self::$curKey=$newId;
+			}
 			return $DB;
 		} 
 		
@@ -112,61 +113,51 @@
 		 * @throws FormatException Если неверно задан ключ.
 		 */
 		public static function unsetDB($key=null){
-			if ($key==null) 
-				$key=self::$curKey!=-1 ? self::$curKey : self::$alterKey;
+			if (is_null($key)) {
+				if(self::$curKey!=-1){
+					$key=self::$curKey;
+					self::$curKey=-1;
+				}else{
+					$key=self::$alterKey;
+					self::$alterKey=-1;
+				}
+			}
 			if ($key instanceof SQLDB) $key=$key->getId();
 			if (!is_string($key) || !array_key_exists($key,self::$arrInst)) throw new FormatException("Неверный формат ключа", "Неверный тип данных");
 			
-			//Если уничтожается альтернативное подключение
-			if ($key==self::$alterKey){
-				self::$alterKey =-1;
-			}
-			
 			unset(self::$arrInst[$key]);
-			
-			// Ищем последний объект
-			end(self::$arrInst);
-			self::$curKey=key(self::$arrInst);
-			
-			//Если объектов больше нет 
-			if (!self::$curKey) {
-				self::$curKey = -1; 
-			}
 		}
 		
 		/**
-		 * Возвращает объект, соответствующий альтернативному соединению и устанавливает его для работы п оумолчанию
+		 * Возвращает объект, соответствующий альтернативному соединению.
 		 *
 		 * Если альтернативного объекта нет, то он создается. 
-		 * Если есть альтернативный объект и задано $config, то выбрасывается SqlException 
 		 * 
-		 * @throws VoltException, FormatException, SqlException
 		 * @param mixed $config Конфигурационный массив
 		 * @return object Объект для работы с БД
+		 * @throws FormatException - если заданы неверные данные.
 		 */
-		public static function getAlterDB($config=null){
+		public static function getAlterDB($userConfig=null){
 			//Если альтернативного соединения нет
 			global $vf;
-			if (self::$alterKey==-1){
-				if (!$config){
+			if (is_null($userConfig)){
+				if (self::$alterKey==-1){
 					$config["base"]=$vf["db"]["base2"];
+					$DB=self::getDB($config);
+					self::$alterKey=$DB->getId();
+					return $DB;
+				}else{
+					return self::$arrInst[self::$alterKey];
+				}
+			}else{
+				$config["base"]=$vf["db"]["base2"];
+				if (is_string($userConfig)){
+					$config["subd"]=$userConfig;
+				}elseif(is_array($userConfig)){
+					$config=array_merge($config, $userConfig);
 				}
 				$DB=self::getDB($config);
-				self::$alterKey=self::$curKey;
-				//Записываем новый объект в начало массива.
-				$tempArr[self::$curKey]=array_pop(self::$arrInst);
-				self::$arrInst=array_merge($tempArr,self::$arrInst);
-				end(self::$arrInst);
-				self::$curKey=key(self::$arrInst);
-
 				return $DB;
-			}
-
-			if ($config){
-				throw new SqlException("Альтернативное соединение уже существует","Уже есть","Нет запроса");
-			}
-			else {
-				return self::$arrInst[self::$alterKey];
 			}
 		}
 	}
