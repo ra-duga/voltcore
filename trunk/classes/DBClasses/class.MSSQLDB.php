@@ -273,7 +273,7 @@
 			
 		}
 		
-				/**
+		/**
 		 * Обрабатывает спецсимволы в строке для безопасного ее использования в запросе
 		 *
 		 * @param mixed $str Строка, в которой надо экранировать спецсимволы или число или null.
@@ -294,6 +294,18 @@
 			}
 			return $str;
 		}
+		
+		public function getColumnsInfo($table){
+			$dbTable=$this->escapeKeys($table);
+			return $this->select("select c.name as fname, c.max_length as flen, t.name as tname, c.is_nullable as allowBlank,
+					(SELECT value
+					FROM fn_listextendedproperty('MS_Description', 'SCHEMA', 'dbo', 'table', '$table', 'column', c.name)) as descr
+				from sys.columns as c join sys.types as t 
+				on c.system_type_id=t.system_type_id and c.user_type_id=t.user_type_id 
+				where object_id = OBJECT_ID('$dbTable')");
+		}
+		
+		
 		
 	}
 ?>

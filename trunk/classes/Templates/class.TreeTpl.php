@@ -51,8 +51,8 @@
 		public function __construct($tree, $tplType=TreeTpl::UL, $cache=null, $dir=null){
 			switch ($tplType) {
 				case TreeTpl::UL: parent::__construct(VCROOT."/Templates/tree.tpl", $cache, $dir); break;
-				case TreeTpl::EXTJS: parent::__construct(VCROOT."/Templates/extJSTree.tpl", $cache, $dir); break;
-				case TreeTpl::EXTJSADV:parent::__construct(VCROOT."/Templates/extJSAdvTree.tpl", $cache, $dir); break;
+				case TreeTpl::EXTJS: parent::__construct(VCROOT."/Templates/ExtJS/extJSTree.tpl", $cache, $dir); break;
+				case TreeTpl::EXTJSADV:parent::__construct(VCROOT."/Templates/ExtJS/extJSAdvTree.tpl", $cache, $dir); break;
 				default: parent::__construct(VCROOT."/Templates/tree.tpl", $cache, $dir);
 			}
 			$this->tree=$tree;

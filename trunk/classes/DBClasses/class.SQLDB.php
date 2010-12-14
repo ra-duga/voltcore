@@ -261,6 +261,14 @@
 		 */
 		abstract public function escape($str);
 		
+		/**
+		 * Возвращает информацию о столбцах таблицы.
+		 * 
+		 * @param string $table Имя таблицы.
+		 * @return resource Информация о столбцах таблицы.
+		 */
+		abstract public function getColumnsInfo($table);
+		
 		
 											/////////////////////
 											//Магические методы//

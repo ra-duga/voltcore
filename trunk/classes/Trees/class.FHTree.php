@@ -10,7 +10,7 @@
 	 */
 	
 	/**
-	 * Класс для работы с деревом. Дерево хранится по принципу Full Hierarchy (Redundant Adjacency List по другим источникам). 
+	 * Класс для работы с деревом. Дерево хранится по принципу Full Hierarchy (Redundant Adjacency List по другим источникам, Closure Table - по третьим). 
 	 * 
 	 * Данная реализация принципа предполагает:
 	 * 1)Существует корневой элемент. 
@@ -51,6 +51,7 @@
 		 * 		idNameField Имя поля, в котором содержатся идентификаторы узлов в таблице имен.
 		 * 		nameField Имя поля, в котором содержатся имена узлов.
 		 * 		orderField Имя поля, по которому происходит сортировка.
+		 * 		idPrefix Префикс для добавления к идентификаторам узлов.
 		 * 		(потомком - FHTree)
 		 * 		idParField Имя поля с идентификаторами родителей. 
 		 * 		levelField Имя поля с уровнем.
@@ -172,7 +173,7 @@
 			$path=array();
 			while($row=$this->DB->fetchAssoc()){
 				if(!isset($path[$row["cid"]])){
-					$path[$row["cid"]]=array("name"=>$row["cname"], "id"=>$row["cid"], "tree"=>array());
+					$path[$row["cid"]]=array("name"=>$row["cname"], "id"=>$this->idPrefix.$row["cid"], "tree"=>array());
 					if ($extra){
 						foreach($extraFields as $k=>$v){
 							$path[$row["cid"]][$k]=$row[$k];
