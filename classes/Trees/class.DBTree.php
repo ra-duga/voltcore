@@ -212,6 +212,7 @@
 		 * 		idNameField Имя поля, в котором содержатся идентификаторы узлов в таблице имен.
 		 * 		nameField Имя поля, в котором содержатся имена узлов.
 		 * 		orderField Имя поля, по которому происходит сортировка.
+		 * 		idPrefix Префикс для добавления к идентификаторам узлов.
 		 */
 		protected function assignNames($arrNames){
 			$this->table=$this->DB->escapeKeys($arrNames['table']);
@@ -220,6 +221,7 @@
 			$this->idNameField=(isset($arrNames['idNameField']) && $arrNames['idNameField']) ? $this->DB->escapeKeys($arrNames['idNameField']) : null;
 			$this->nameField=(isset($arrNames['nameField']) && $arrNames['nameField']) ? $this->DB->escapeKeys($arrNames['nameField']) : null;
 			$this->orderField=(isset($arrNames['orderField']) && $arrNames['orderField']) ? $this->DB->escapeKeys($arrNames['orderField']) : null;
+			$this->idPrefix=(isset($arrNames['idPrefix']) && $arrNames['idPrefix']) ? $arrNames['idPrefix'] : '';
 		}
 		
 		/**

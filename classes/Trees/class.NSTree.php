@@ -63,6 +63,7 @@
 		 * 		idNameField Имя поля, в котором содержатся идентификаторы узлов в таблице имен.
 		 * 		nameField Имя поля, в котором содержатся имена узлов.
 		 * 		orderField Имя поля, по которому происходит сортировка.
+		 * 		idPrefix Префикс для добавления к идентификаторам узлов.
 		 * 		(потомком - NSTree)
 		 * 		leftField Имя поля с левой границей. 
 		 * 		rightField Имя поля с правой границей. 
@@ -190,7 +191,7 @@
 			$i=0;
   			while($row=$DB->fetchAssoc()){
   				$arr=array();
-				$arr['id']=$row['cid'];
+				$arr['id']=$this->idPrefix.$row['cid'];
 				$arr['name']=$row['cname'];
 				$arr['tree']=array();
     			if ($extra){

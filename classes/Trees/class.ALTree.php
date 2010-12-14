@@ -43,6 +43,7 @@
 		 * 		idNameField Имя поля, в котором содержатся идентификаторы узлов в таблице имен.
 		 * 		nameField Имя поля, в котором содержатся имена узлов.
 		 * 		orderField Имя поля, по которому происходит сортировка.
+		 * 		idPrefix Префикс для добавления к идентификаторам узлов.
 		 * 		(потомком - ALTree)
 		 * 		idParField Имя поля с идентификаторами родителей. 
 		 */
@@ -128,7 +129,7 @@
 			$path=array();
 			while($row=$DB->fetchAssoc()){
 				if(!isset($path[$row["cid"]])){
-					$path[$row["cid"]]=array("name"=>$row["cname"], "id"=>$row["cid"], "tree"=>array());
+					$path[$row["cid"]]=array("name"=>$row["cname"], "id"=>$this->idPrefix.$row["cid"], "tree"=>array());
 					if ($extra){
 						foreach($extraFields as $k=>$v){
 							$path[$row["cid"]][$k]=$row[$k];
@@ -137,7 +138,7 @@
 									}
 				else{
 					$path[$row["cid"]]["name"]=$row["cname"];
-					$path[$row["cid"]]["id"]=$row["cid"];
+					$path[$row["cid"]]["id"]=$this->idPrefix.$row["cid"];
 					if ($extra){
 						foreach($extraFields as $k=>$v){
 							$path[$row["cid"]][$k]=$row[$k];
