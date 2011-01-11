@@ -35,7 +35,7 @@
 		if (is_array($masPar)) {
 			$masPar=implode("|",$masPar);
 		}
-		$logText=$mes."|".$type."|".$masPar."|".date("d-m-Y H:i:s").PHP_EOL;
+		$logText=$mes."|".$masPar."|".$type."|".date("d-m-Y H:i:s").PHP_EOL;
 		file_put_contents($file, $logText, FILE_APPEND);
 		}
 
@@ -112,7 +112,7 @@
 		if (is_array($masPar)) {
 			$masPar=implode("|",$masPar);
 		}
-		$logText=$mes."|".$type."|".$masPar."|".date("d-m-Y H:i:s")."\r\n";
+		$logText=$mes."|".$masPar."|".$type."|".date("d-m-Y H:i:s")."\r\n";
 		$logFile=$vf["log"][$fil];
 		
 		makeDirs($logFile);

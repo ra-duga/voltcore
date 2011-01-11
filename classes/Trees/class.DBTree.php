@@ -78,6 +78,11 @@
 		 */
 		const SORT_DESC=1;
 		
+		/**
+	 	 * Конфигурационный массив.
+	 	 * @var array
+		 */
+		protected $config;
 		
 		/**
 	 	 * Таблица, в которой лежит дерево.
@@ -215,6 +220,7 @@
 		 * 		idPrefix Префикс для добавления к идентификаторам узлов.
 		 */
 		protected function assignNames($arrNames){
+			$this->config=$arrNames;
 			$this->table=$this->DB->escapeKeys($arrNames['table']);
 			$this->idField=$this->DB->escapeKeys($arrNames['idField']);
 			$this->nameTable=(isset($arrNames['nameTable']) && $arrNames['nameTable']) ? $this->DB->escapeKeys($arrNames['nameTable']) : null;
@@ -419,16 +425,18 @@
 		 * @param string $idChild Имя ребенка.
 		 * @param mixed $idParent Идентификатор родителя.
 		 * @param int $orderNum Номер ребенка по порядку.
+		 * @param array $fields Поля для вставки в таблицу имен.
 		 * @return string Идентификатор ребенка.
 		 * @throws SqlException При ошибке работы с базой.
 		 */
-		protected function insertChild($idChild,$idParent=null, $orderNum=null){
+		protected function insertChild($idChild,$idParent=null, $orderNum=null, $fields=array()){
+			$insertArr[$this->config['nameField']]=$idChild;
+			$insertArr=$insertArr+$fields;
 			if ($this->orderField){
 				$sorder=$this->prepareForNewOrder($idParent, $orderNum);
-				$idChild=$this->DB->insert("insert into $this->nameTable($this->nameField, $this->orderField) values($idChild, $sorder)");
-			}else{
-				$idChild=$this->DB->insert("insert into $this->nameTable($this->nameField) values($idChild)");
+				$insertArr[$this->config['orderField']]=$sorder;
 			}
+			$idChild=$this->DB->insert($insertArr, $this->nameTable);
 			return $idChild;
 		}
 		
@@ -460,22 +468,24 @@
 		 * @param mixed $parId Идентификатор родителя или уникальная строка для поиска в таблице имен.
 		 * @param int $haveNames Определяет, какие параметры считать именами.
 		 * @param int $orderNum Номер нового узла по-порядку для сортировки.
+		 * @param array $fields Поля для вставки в таблицу имен.
 		 * @throws SqlException При ошибке работы с базой.
 		 * @throws FormatException Если указаны не все поля.
 		 */
-		public function add($id, $parId, $haveNames=DBTree::NO_NAME, $orderNum=null){
+		public function add($id, $parId, $haveNames=DBTree::NO_NAME, $orderNum=null, $fields=array()){
 			if ($haveNames!=DBTree::NO_NAME && (!$this->nameTable || !$this->nameField)) throw new FormatException("Недостаточно данных.","Указаны не все данные");
 			$DB=$this->DB;
 			try{
 				$DB->startTran();
 				
-				$idChild=$DB->escapeString($id);
 				$idParent=$this->getIdByName($parId, $haveNames, false);
 
 				if ($this->haveChildName($haveNames)){
-					$idChild=$this->insertChild($idChild,$idParent,$orderNum);
+					$idChild=$this->insertChild($id,$idParent,$orderNum, $fields);
+				}else{
+					$idChild=$DB->escapeString($id);
 				}
-
+				
 				$insert=$this->doAddInsert($idChild, $idParent, $orderNum);
 				
 				$DB->commit();

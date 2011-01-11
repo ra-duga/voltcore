@@ -5,21 +5,21 @@
 <?php		if ($first) $first=false; else {?>
 ,{
 <?php		} ?>
-		text: "<?php echo $child['name']?>",
+		expanded: false,
 <?php		foreach($child as $key=>$data) {?>
 <?php			if($key!="tree" && $key!="name") {?>
-<?php 		echo $key;?>: "<?php echo $data;?>",
+<?php 		echo $key ?>: <?php echo toJS($data) ?>,
 <?php			} ?>
 <?php 		} ?>
-		expanded: false,
+		text: "<?php echo $child['name']?>",
 <?php 		if(isset($child['tree']) && is_array($child['tree'])) { ?>
 <?php 			echo new TreeTpl($child['tree'], TreeTpl::EXTJSADV);?>
-<?php 		}else {?>
+<?php 		}else{ ?>
 		leaf: true
 <?php		} ?>
 		}
 <?php	} ?>
 	]
-<?php }else { ?>
-	leaf: true
-<?php } ?>
+<?php 		}else{ ?>
+		leaf: true
+<?php		} ?>
