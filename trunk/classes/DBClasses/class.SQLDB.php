@@ -260,12 +260,22 @@
 		 * @return mixed Строка с экранированными спецсимволы.
 		 */
 		abstract public function escape($str);
+
+		/**
+		 * Обрабатывает спецсимволы в строке для безопасного ее использования в конструкции like
+		 *
+		 * @param string $str Строка, в которой надо экранировать спецсимволы.
+		 * @return string Строка с экранированными спецсимволы.
+		 * TODO реализовать для mysql
+		 */
+		abstract public function escapeForLike($str);
 		
 		/**
 		 * Возвращает информацию о столбцах таблицы.
 		 * 
 		 * @param string $table Имя таблицы.
 		 * @return resource Информация о столбцах таблицы.
+		 * TODO реализовать для mysql
 		 */
 		abstract public function getColumnsInfo($table);
 		
@@ -894,11 +904,11 @@
 		 */
 		protected function checkDoubleTir($sql){
 			$pos=strpos($sql,"--");
-			if ($pos!==false) {
+			if ($pos!==false && $this->notInQutes($sql,$pos)){
 				throw new SqlException("Два тире подряд", "Потенциально опасные данные", $sql);
 			}
 			$pos=strpos($sql,"/*");
-			if ($pos!==false) {
+			if ($pos!==false && $this->notInQutes($sql,$pos)) {
 				throw new SqlException("Открытие комментария", "Потенциально опасные данные", $sql);
 			}
 		}
@@ -1018,30 +1028,15 @@
 		 * @return boolean Резултат проверки
 		 */
 		protected function notInQutes($gde,$otkuda){
-			$posQ2=-1;
-			$posQ1=-1;
-			while ($posQ1!==false){
-				$posQ1=strpos($gde,"'",$posQ2+1); //Находим открывающий апостроф
-				$flag=true;
-				$posQ=$posQ1;
-				while ($flag and $posQ2!==false) {
-					$posQ2=strpos($gde,"'",$posQ+1); //Находим закрывающий апостроф
-					$posQ=strpos($gde,"'",$posQ2+1); //Находим символ экранирования
-					//Если нашли не экранированный апостроф, то выходим их цикла
-					if ($posQ!==$posQ2+1){
-						$flag=false;
-					}
-				}
-				//Если нашли два апострофа
-				if ($posQ1!==false && $posQ2!==false){
-					//Если позиция между апострофами
-					if ($posQ1<=$otkuda && $otkuda<=$posQ2){
-						return false;
-					}
-					//Если первый апостроф правее позиции, значит все возможожные пары до этого уже проверены. 
-					if ($otkuda<$posQ1){
-						return true;
-					}
+			$sql=str_replace("''", "\\\\", $gde);
+			$strs=explode("'", $sql);
+			$pos=0;
+			$i=0;
+			foreach($strs as $str){
+				$i++;
+				$pos+=strlen($str);
+				if ($otkuda<=$pos){
+					return $i%2>0  || !isset($strs[$i]);
 				}
 			}
 			return true;

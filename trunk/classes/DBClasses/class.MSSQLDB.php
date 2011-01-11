@@ -83,6 +83,9 @@
 					throw new SqlException("Ошибка при выставлении параметра транзакций","Ошибка подключения","Нет запроса");
 				}
 			}
+//			$this->exec("use ".$this->db, false);
+			
+			
 		}
 		
 		/**
@@ -269,6 +272,16 @@
 			$esc=str_replace("'", "''", $str);
 			$esc=str_replace("/*", "", $esc);
 			$esc=str_replace("*/", "", $esc);
+			return $esc;
+			
+		}
+		
+		public function escapeForLike($str, $escChar='\\'){
+			$arrChar=array($escChar, '%', '_', '[', ']', '^');
+			foreach($arrChar as $char){
+				$arrReplace[]=$escChar.$char;
+			}
+			$esc=str_replace($arrChar, $arrReplace, $str);
 			return $esc;
 			
 		}

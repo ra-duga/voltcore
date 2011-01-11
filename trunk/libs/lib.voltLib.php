@@ -72,6 +72,16 @@
 	}
 	
 	/**
+	 * Заменяет URL адреса на ссылки.
+	 *   
+	 * @param string $text Текст в котором надо произвести замену.
+	 * @return string Текст с сылками.
+	 */
+	function hrefToA($text){
+		return preg_replace('#\b(aaa|aaas|acap|cap|cid|crid|data|dav|dict|dns|fax|file|ftp|go|gopher|h323|http|https|im|imap|ldap|mailto|mid|news|nfs|nntp|pop|pres|rtsp|sip|sips|snmp|tel|telnet|urn|wais|xmpp|about|aim|bolo|btc|bzr|callto|chrome|cvs|daap|ed2k|ed2kftp|feed|fish|git|gizmoproject|iax2|irc|ircs|lastfm|ldaps|magnet|mms|msnim|psyc|rsync|secondlife|skype|ssh|svn|sftp|smb|sms|soldat|steam|unreal|ut2004|view-source|vzochat|webcal|xfire|ymsgr)://[^\s\'"><]+#i', '<a href="$0">$0</a>', $text); 
+	}
+	
+	/**
 	 * Генерирует пароль.
 	 * 
 	 * @param int $num Количество символов в пароле. (Не более 248)
@@ -108,4 +118,21 @@
 		}
 		preg_match("#(\d{1,2}).(\d{1,2}).(\d{4})\s(\d{1,2}).(\d{1,2}).(\d{1,2})#", $fullDate, $matches);
 		return mktime($matches[6],$matches[5],$matches[4], $matches[2], $matches[1], $matches[3]);
+	}
+	
+	/**
+	 * Подготовливает $data к печати в js шаблон.
+	 * 
+	 * @param mixed $data Данные для вывода.
+	 * @return string Строка для вывода.
+	 */
+	function toJS($data){
+		if (is_string($data)){
+			return '"'.$data.'"';
+		}
+		if (is_bool($data)){
+			return $data ? 'true' : 'false';
+		}
+		return $data;
+		
 	}

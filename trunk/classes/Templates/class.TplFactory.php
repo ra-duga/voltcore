@@ -40,6 +40,12 @@
 		 * @var string
 		 */
 		protected $defaultTpl='index';
+
+		/**
+		 * Нужно ли логировать ошибку вызова несуществующего метода.
+		 * @var bool
+		 */
+		protected $needLogError=true;
 		
 		/**
 		 * Логирует запрос несуществующего шаблона.
@@ -71,7 +77,9 @@
 			if (method_exists($this, $method)){
 				return $this->$method();
 			}else{
-				$this->logErrorCall($method);
+				if ($this->needLogError){
+					$this->logErrorCall($method);
+				}
 				$method="set".ucfirst($this->defaultPage)."Info";
 				return $this->$method();			
 			}

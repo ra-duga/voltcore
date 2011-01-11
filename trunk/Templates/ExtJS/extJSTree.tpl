@@ -9,12 +9,12 @@
 		expanded: false,
 <?php 		if($child['tree'] && is_array($child['tree'])) { ?>
 <?php 			echo new TreeTpl($child['tree'], TreeTpl::EXTJS);?>
-<?php 		}else {?>
+<?php 		}else{ ?>
 		leaf: true
 <?php		} ?>
 		}
 <?php	} ?>
 	]
-<?php }else { ?>
-	leaf: true
+<?php }else{ ?>
+		leaf: true
 <?php } ?>

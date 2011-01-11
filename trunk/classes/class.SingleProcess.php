@@ -35,13 +35,13 @@
 
 		/**
 		 * Стратегия прав доступа к процессу.
-		 * @var object
+		 * @var UserRights
 		 */
 		protected $rights;
 		
 		/**
 		 * Объект для работы с БД.
-		 * @var object
+		 * @var SQLDB
 		 */
 		protected $db;
 		
