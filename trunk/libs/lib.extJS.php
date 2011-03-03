@@ -18,7 +18,8 @@
 	 * 
 	 * Создает из содержания файлов div'ы, которые могут автоматически преобразоваться в закладки TabPanel.
 	 * 
-	 * @param string $dir директория из которой брать файлы  
+	 * @param string $dir директория из которой брать файлы
+	 * TODO Реализовать листы подстановок (combobox)  
 	 */
 	function tabsFromFiles($dir=false){
 		tabsFromArrFiles(getPHPFiles($dir));
@@ -62,6 +63,7 @@
 					$rez['editor']['xtype']='"textfield"';
 					$rez['editor']['maxLength']=$row['flen'];
 				}
+				$rez['filter']['type']='"string"';
 			break;
 			case 'int':
 			case 'smallint':
@@ -71,6 +73,8 @@
 					$rez['format']="'U'";
 					$rez['record']['type']='date';
 					$rez['record']['dateFormat']='U';
+					$rez['filter']['type']='"date"';
+					$rez['filter']['dateFormat']='"U"';
 					if($editor){
 						$rez['editor']['xtype']='"datefield"';
 						$rez['editor']['format']='"U"';
@@ -78,6 +82,7 @@
 				}elseif ($row['fname']=='id'){
 					$rez['width']=40;
 					$rez['record']['type']='int';
+					$rez['filter']['type']='"numeric"';
 				}else{
 					$rez['width']=40;
 					$rez['record']['type']='int';
@@ -85,12 +90,14 @@
 						$rez['editor']['xtype']='"textfield"';
 						$rez['editor']['vtype']='"num"';
 					}
+					$rez['filter']['type']='"numeric"';
 				}
 			break;
 			case 'ntext':
 			case 'text':
 				$rez['width']=400;
 				$rez['record']['type']='string';
+				$rez['filter']['type']='"string"';
 				if($editor){
 					$rez['editor']['xtype']='"textarea"';
 					$rez['editor']['cls']='"bigArea"';
@@ -100,6 +107,7 @@
 			default:
 				$rez['width']=50;
 				$rez['record']['type']='"string"';
+				$rez['filter']['type']='"string"';
 				if($editor){
 					$rez['editor']['xtype']='"textfield"';
 				}

@@ -141,4 +141,3 @@
 		if ($return) return $name." => ".$msg;
 		else logMsg($name." => ".$msg, $type, 'var', $masPar);
 	}
-?>

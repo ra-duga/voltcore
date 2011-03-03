@@ -61,10 +61,12 @@
 	 	 * @return string Имя СУБД (mssql, mysql) 
 	 	 */
 	 	static protected function determineDB($db){
-	 		if ($db instanceof MSSQLDB){
+	 		if ($db instanceof ODBTPMSSQL){
 	 			return "mssql";
 	 		}elseif($db instanceof MySQLDB){
 	 			return "mysql";
+	 		}elseif($db instanceof ODBCMSAccess){
+	 			return "access";
 	 		}else{
 	 			throw new FormatException("Не удаются определить СУБД","Неверные данные");
 	 		}

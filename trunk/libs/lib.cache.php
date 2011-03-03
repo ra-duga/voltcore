@@ -50,7 +50,13 @@
 	 * @param string $dir Дирректория с кэшем.
 	 */
 	function cacheToFile($key, $val, $dir=null){
-		file_put_contents(getCacheFileName($key, $dir), $val);
+		$file=getCacheFileName($key, $dir);
+		try{
+			makeDirs($file);
+		}catch(FormatException $e){
+			// уже залогирована.
+		}
+		file_put_contents($file, $val);
 	}
 	
 	/**
