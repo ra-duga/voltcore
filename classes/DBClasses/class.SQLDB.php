@@ -744,7 +744,7 @@
 		 * @return string Сформированное условие.
 		 */
 		public function getWhere($where){
-				if (is_array($where)) return " where ".$this->getAssignmentString($where, " and");
+				if (is_array($where)) return " where ".$this->getAssignmentString($where, " and ");
 				if (is_int($where)) return " where id=".$where;
 				if (!empty($where)) return " where ".$where;
 				return'';
@@ -792,7 +792,7 @@
  		 * echo $str;
  		 * 
  		 * ?>
- 		 * В случае использования MSSQLDB результат будет таким:
+ 		 * В случае использования ODBTPMSSQL результат будет таким:
  		 * [id]=50, [title]='Новая книга', [izd]=NULL
  		 * </code>
 		 * 
@@ -920,7 +920,6 @@
 		 * @param int $unionCol Количество операторов union
 		 */
 		protected function checkDoubleQuery($sql,$unionCol=0){
-			
 			//Проверка на наличие Union
 			if ($this->checkU){
 				$pos=-1;
@@ -1030,11 +1029,11 @@
 		protected function notInQutes($gde,$otkuda){
 			$sql=str_replace("''", "\\\\", $gde);
 			$strs=explode("'", $sql);
-			$pos=0;
+			$pos=-1;
 			$i=0;
 			foreach($strs as $str){
 				$i++;
-				$pos+=strlen($str);
+				$pos+=strlen($str)+1;
 				if ($otkuda<=$pos){
 					return $i%2>0  || !isset($strs[$i]);
 				}

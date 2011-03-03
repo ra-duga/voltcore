@@ -52,7 +52,11 @@
 		 * 
 		 * @param $mes Запрошенный шаблон
 		 */
-		abstract protected function logErrorCall($mes);
+		protected function logErrorCall($mes, $file=null, $type=null){
+			$file=$file ? $file : EVENTDIR.'/wrongTplQuery.log';
+			$type=$type ? $type : 'Запрос несуществующего шаблона';
+			logToFile($mes, $file, $type,$_SERVER['REMOTE_ADDR']);
+		}
 
 		/**
 		 * Перехват вызова несуществующего метода.

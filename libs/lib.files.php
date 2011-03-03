@@ -100,7 +100,7 @@
 	function makeDirs($file){
 		if (!file_exists(dirname($file))){
 			if (!mkdir(dirname($file), 0777, true)){
-				throw FormatException("Не удалось создать дирректории","Некуда записывать");
+				throw new FormatException("Не удалось создать дирректории","Некуда записывать");
 			}
 		}
 	}

@@ -24,7 +24,7 @@
 	 * @package VoltCoreClasses
 	 * @subpackage DBAdapters
 	 */
-	class MSSQLDB extends SQLDB{
+	class ODBTPMSSQL extends SQLDB{
 
 		/**
 		 * Символ для обрамления ключа слева.
@@ -61,13 +61,17 @@
 		}
 		
 		/**
-		 * Создает объект для работы с MS SQL Server
+		 * Создает объект для работы с MS SQL Server.
+		 * 
 		 * @param array $config Конфигурация подключения к БД
-		 * @return MSSQLDB Экземпляр класса
 		 */
-		public function __construct($config){
+		public function __construct($config,$userDsn=null){
 			$this->setConfig($config);
-			$dsn="Driver={SQL Native Client};Server=$this->host;Database=$this->db;Uid=$this->login;Pwd=$this->pass";
+			if ($userDsn){
+				$dsn=$userDsn;
+			}else{
+				$dsn="Driver={SQL Native Client};Server=$this->host;Database=$this->db;Uid=$this->login;Pwd=$this->pass";
+			}
 			$this->link=odbtp_connect($this->host, $dsn);
 			if (!$this->link){
 				throw new SqlException("Ошибка при подключении к серверу","Ошибка подключения","Connect");
@@ -150,9 +154,12 @@
 		 * Отключает autocommit и посылает серверу команду начать транзакцию.
 		 */
 		public function startTran(){
-			$temp=odbtp_set_attr(ODB_ATTR_TRANSACTIONS, ODB_TXN_DEFAULT,$this->link);
-			if (!$temp){
-				throw new SqlException("Ошибка при выставлении параметра транзакций","Ошибка подключения","SET TRANSACTION ISOLATION LEVEL");
+			$attr=odbtp_get_attr(ODB_ATTR_TRANSACTIONS,$this->link);
+			if ($attr==ODB_TXN_NONE){
+				$temp=odbtp_set_attr(ODB_ATTR_TRANSACTIONS, ODB_TXN_DEFAULT,$this->link);
+				if (!$temp){
+					throw new SqlException("Ошибка при выставлении параметра транзакций","Ошибка подключения","SET TRANSACTION ISOLATION LEVEL");
+				}
 			}
 		}
 
@@ -321,4 +328,3 @@
 		
 		
 	}
-?>

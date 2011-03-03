@@ -110,8 +110,10 @@
 	 * Создает timestamp из даты формата d.m.Y H:i:s
 	 * 
 	 * @param string $date Дата формата d.m.Y H:i:s
+	 * @return int timestamp соответствующий входной дате.
 	 */
 	function timestampFromDate($date){
+		if(strlen($date)<9) throw new FormatException('Неправильный формат даты','Некорректные данные');
 		$fullDate=$date;
 		if (strlen($date)<12){
 			$fullDate=$date." 00:00:00";

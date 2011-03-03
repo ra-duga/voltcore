@@ -89,7 +89,8 @@
 			////////////////
 			switch ($config["subd"]){
 				case "mysql": $DB= new MySQLDB($config); break; 
-				case "mssql": $DB= new MSSQLDB($config); break;
+				case "mssql": $DB= new ODBTPMSSQL($config); break;
+				case "accsess": $DB= new ODBCMSAccess($config); break;
 				default : throw new FormatException("Данный тип СУБД не поддерживается", "Некорректные данные");
 			}
 

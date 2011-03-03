@@ -31,6 +31,25 @@
 <?php } ?>
 <?php } ?>
 	
+<?php if (isset($filterName) ){ ?>
+	var <?php echo $filterName ?> = new Ext.ux.grid.GridFilters({
+        local: <?php echo $localFilters ?>,
+		filters:[{
+		<?php $first=true; ?>
+		<?php foreach($fields as $fname=>$f){ ?>
+		<?php	if ($first) $first=false; else { ?>
+			,{
+		<?php	} ?>
+		<?php	foreach($f['filter'] as $k=>$v){	?>
+			<?php echo $k ?>: <?php echo $v ?>,
+		<?php 	} ?>
+			dataIndex: '<?php echo $fname ?>'
+			}		
+<?php } ?>
+		]
+	});
+<?php } ?>
+
 	var <?php echo $columnsName ?> = [{
 <?php $first=true; ?>
 <?php foreach($fields as $fname=>$f){ ?>	

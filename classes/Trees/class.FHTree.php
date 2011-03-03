@@ -166,7 +166,7 @@
 						left outer join $tab as par on par.$id=t2.$pid
 					where t.$pid=$subTreeRoot
 					order by t.$level, $sFiled c.$name";
-
+			
 			$this->DB->select($sql);
 			
 			//Запись в массив

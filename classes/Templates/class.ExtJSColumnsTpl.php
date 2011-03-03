@@ -41,6 +41,12 @@
 		const STORE=2;
 
 		/**
+		 * Создать фильтры.
+		 * @var int
+		 */
+		const FILTERS=3;
+		
+		/**
 		 * Конструктор.
 		 * 
 		 * @param array $columns Массив колонок.
@@ -66,6 +72,10 @@
 					$this->method='POST';
 					$this->baseParams='{}';
 					$this->storeId='VC_Store';
+					if ($tplType>2){
+						$this->filterName='VC_Filters';
+						$this->localFilters='false';
+					}
 				}
 			}
 		}

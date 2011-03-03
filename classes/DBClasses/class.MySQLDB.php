@@ -57,9 +57,9 @@
 		}
 		
 		/**
-		 * Создает объект для работы с MySQL
+		 * Создает объект для работы с MySQL.
+		 * 
 		 * @param array $config Конфигурация подключения к БД
-		 * @return MSSQLDB Экземпляр класса
 		 */
 		public function __construct($config){
 			$this->setConfig($config);
