@@ -24,7 +24,7 @@
 	 * @package VoltCoreClasses
 	 * @subpackage DBAdapters
 	 */
-	class ODBTPMSSQL extends SQLDB{
+	class ODBCMSSQL extends SQLDB{
 
 		/**
 		 * Символ для обрамления ключа слева.
@@ -45,7 +45,7 @@
 		 * @var string
 		 */
 		protected $RKS="]";
-		
+				
 		/**
 		 * Метод реализует шаблон Singleton.
 		 * 
@@ -72,31 +72,19 @@
 			}else{
 				$dsn="Driver={SQL Native Client};Server=$this->host;Database=$this->db;Uid=$this->login;Pwd=$this->pass";
 			}
-			$this->link=odbtp_connect($this->host, $dsn);
+			$this->link=odbc_connect($dsn, $this->login, $this->pass);
 			if (!$this->link){
 				throw new SqlException("Ошибка при подключении к серверу","Ошибка подключения","Connect");
 			}
-			
-			$temp=odbtp_set_attr(ODB_ATTR_TRANSACTIONS, ODB_TXN_NONE,$this->link);
-			if (!$temp){
-				throw new SqlException("Ошибка при выставлении параметра транзакций","Ошибка подключения","SET TRANSACTION ISOLATION LEVEL");
-			}
-			if (!$this->needEnc){
-				$temp=odbtp_set_attr(ODB_ATTR_UNICODESQL, 1,$this->link);
-				if (!$temp){
-					throw new SqlException("Ошибка при выставлении параметра транзакций","Ошибка подключения","Нет запроса");
-				}
-			}
-			//			$this->exec("use ".$this->db, false);
-			
-			
+
+			odbc_autocommit($this->link, true);
 		}
 		
 		/**
 		 * Закрывает соединение 
 		 */
 		protected function closeConnection(){
-			odbtp_close($this->link);
+			odbc_close($this->link);
 		}
 		
 		/**
@@ -106,7 +94,7 @@
 		 * @param string $sql Запрос для выполнения
 		 */
 		protected function query($sql){
-			return odbtp_query($sql,$this->link);
+			return odbc_exec($this->link, $sql);
 		}
 
 		/**
@@ -115,7 +103,7 @@
 		 * @return string Код последней ошибки
 		 */
 		public function getErrorCode(){
-			return odbtp_last_error_code($this->link);
+			return odbc_error($this->link);
 		}
 		
 		/**
@@ -124,7 +112,7 @@
 		 * @return string Сообщение об ошибке
 		 */
 		public function getErrorMsg(){
-			return odbtp_last_error($this->link);
+			return odbc_errormsg($this->link);
 		}
 		
 		/**
@@ -154,16 +142,7 @@
 		 * Отключает autocommit и посылает серверу команду начать транзакцию.
 		 */
 		public function startTran(){
-			$attr=odbtp_get_attr(ODB_ATTR_TRANSACTIONS,$this->link);
-			if ($attr==ODB_TXN_NONE){
-				$temp=odbtp_set_attr(ODB_ATTR_TRANSACTIONS, ODB_TXN_DEFAULT,$this->link);
-				if (!$temp){
-					throw new SqlException("Ошибка при выставлении параметра транзакций","Ошибка подключения","SET TRANSACTION ISOLATION LEVEL");
-				}
-			}else{
-				$this->exec('BEGIN TRANSACTION');
-			}
-			
+			odbc_autocommit($this->link, false);
 		}
 
 		/**
@@ -172,15 +151,8 @@
 		 * Подтверждает транзакцию и включает autocommit.
 		 */
 		public function commit(){
-			if ($this->getSystemVal("select @@TRANCOUNT as smth")==1){
-				odbtp_commit($this->link);
-				$temp=odbtp_set_attr(ODB_ATTR_TRANSACTIONS, ODB_TXN_NONE,$this->link);
-				if (!$temp){
-					throw new SqlException("Ошибка при выставлении параметра транзакций","Ошибка подключения","SET TRANSACTION ISOLATION LEVEL");
-				}
-			}else{
-				odbtp_commit($this->link);
-			}
+			odbc_commit($this->link);
+			odbc_autocommit($this->link, true);
 		}
 
 		/**
@@ -189,13 +161,8 @@
 		 * Производит откат транзакции и включает autocommit.
 		 */
 		public function rollback(){
-			odbtp_rollback($this->link);
-			if ($this->getSystemVal("select @@TRANCOUNT as smth")==0){
-				$temp=odbtp_set_attr(ODB_ATTR_TRANSACTIONS, ODB_TXN_NONE,$this->link);
-				if (!$temp){
-					throw new SqlException("Ошибка при выставлении параметра транзакций","Ошибка подключения","SET TRANSACTION ISOLATION LEVEL");
-				}
-			}
+			odbc_rollback($this->link);
+			odbc_autocommit($this->link, true);
 		}
 
 		/**
@@ -209,10 +176,10 @@
 				$rez=$this->res;
 			}
 			if ($this->needEnc){
-				$nextRow = deepIconv($this->encDB, $this->encFile,odbtp_fetch_assoc($rez));
+				$nextRow = deepIconv($this->encDB, $this->encFile,odbc_fetch_array($rez));
 			}
 			else{
-				$nextRow=odbtp_fetch_assoc($rez);
+				$nextRow=odbc_fetch_array($rez);
 			}
 			return $nextRow;
 		}
@@ -228,10 +195,10 @@
 				$rez=$this->res;
 			}
 			if ($this->needEnc){
-				$nextRow = deepIconv($this->encDB, $this->encFile,odbtp_fetch_object($rez));
+				$nextRow = deepIconv($this->encDB, $this->encFile,odbc_fetch_object($rez));
 			}
 			else{
-				$nextRow=odbtp_fetch_object($rez);
+				$nextRow=odbc_fetch_object($rez);
 			}
 			return $nextRow;
 		}
@@ -246,11 +213,12 @@
 			if (!$rez){
 				$rez=$this->res;
 			}
+			odbc_fetch_into($rez, $arr);
 			if ($this->needEnc){
-				$nextRow = deepIconv($this->encDB, $this->encFile,odbtp_fetch_row($rez));
+				$nextRow = deepIconv($this->encDB, $this->encFile,$arr);
 			}
 			else{
-				$nextRow=odbtp_fetch_row($rez);
+				$nextRow=$arr;
 			}
 			return $nextRow;
 		}
@@ -273,7 +241,7 @@
 			}else{
 				$nextVal=$nextRow;
 			}
-						
+
 			return $nextVal;
 		}
 
@@ -317,7 +285,7 @@
 			if (is_null($str)) return "NULL";
 			if (is_string($str)) {
 				$esc="'".$this->escape($str)."'";
-				if ($this->encDB=="utf-8") $esc="N".$esc;
+				if ($this->encFile=="utf-8") $esc="N".$esc;
 				return $esc;
 			}
 			return $str;

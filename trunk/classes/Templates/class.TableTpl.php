@@ -32,7 +32,7 @@
 		 */
 		public function __construct($res, $cache=null, $dir=null){
 			parent::__construct(VCROOT."/Templates/table.tpl", $cache, $dir);
-			if (is_array($res)){
+			if (is_array($res) || is_object($res)){
 				$this->data=$res;
 			}
 			else{

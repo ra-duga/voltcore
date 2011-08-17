@@ -116,6 +116,7 @@
 	$vf["log"]["VoltException"]=LOGDIR.LOG_PREFIX."exceptions.log";	// Файл сообщений(ошибок) о возникших VoltException исключениях
 	$vf["log"]["FormatException"]=LOGDIR.LOG_PREFIX."exceptions.log";	// Файл сообщений(ошибок) о возникших FormatException исключениях
 	$vf["log"]["TestException"]=LOGDIR.LOG_PREFIX."exceptions.log";	// Файл сообщений(ошибок) о возникших TestException исключениях
+	$vf["log"]["MethodNotExistsException"]=LOGDIR.LOG_PREFIX."exceptions.log";	// Файл сообщений(ошибок) о возникших MethodNotExistsException исключениях
 	$vf["log"]["SqlException"]=LOGDIR.LOG_PREFIX."sql.log";	// Файл сообщений(ошибок) о возникших SqlException исключениях
 	$vf["log"]["debug"]=LOGDIR.LOG_PREFIX."debug.log";			// Файл отладочной информации
 	$vf["log"]["var"]=LOGDIR.LOG_PREFIX."/var.log";						// Файл с залогированными переменными 
@@ -125,6 +126,7 @@
 	$vf["exc"]["SqlException"]=true;		// Логировать ли SqlException
 	$vf["exc"]["FormatException"]=true;		// Логировать ли FormatException
 	$vf["exc"]["TestException"]=false;		// Логировать ли TestException
+	$vf["exc"]["MethodNotExistsException"]=true;		// Логировать ли MethodNotExistsException
 	$vf["exc"]["VoltException"]=true;		// Логировать ли VoltException
 	
 	//Стандартные дирректории
@@ -140,6 +142,8 @@
 
 	//Настройки безопасности.
 	$vf['security']['userRights']='1';		//Стратегия прав пользователей по умолчанию (0 - запрещать все, 1 - все разрешать)
+	
+	$vf['gettext']=false;					//Использовать ли gettext.
 	
 	$vf["cache"]["defType"]="file";			// Куда кэшировать по умолчанию. (file)
 	
