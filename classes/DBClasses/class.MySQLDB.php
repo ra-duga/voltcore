@@ -73,6 +73,7 @@
 				throw new SqlException("Ошибка при выборе БД","Ошибка подключения","Connect");
 			}
 			$this->exec("set names utf8", false);			
+			mysqli_autocommit($this->link,true);
 		}
 		
 		/**
@@ -250,4 +251,3 @@
 		}
 		
 	}
-?>

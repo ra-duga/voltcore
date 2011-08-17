@@ -25,10 +25,52 @@
 	class Zapis {
 		
 		/**
+		 * Направление связи от другой записи к данной.
+		 * @var int
+		 */
+		const TOZAP=0;
+		
+		/**
+		 * Направление связи от данной записи к другой.
+		 * @var int
+		 */
+		const FROMZAP=1;
+		
+		/**
+		 * Связь многие ко многим.
+		 * @var int
+		 */
+		const MMZAP=2;
+
+		/**
+		 * Запись не изменялась.
+		 * @var int
+		 */
+		const NOCH=0;
+		
+		/**
+		 * Запись в процессе изменения.
+		 * @var int
+		 */
+		const CHED=1;
+		
+		/**
+		 * Запись изменена.
+		 * @var int
+		 */
+		const CH=2;
+		
+		/**
 		 * Объект для работы с БД.
 		 * @var SQLDB
 		 */
 		protected $db;
+		
+		/**
+		 * Изменялась ли запись
+		 * @var bool
+		 */
+		protected $changed;
 		
 		/**
 		 * Имя таблицы, из которой беруться записи. 
@@ -47,6 +89,30 @@
 		 * @var array
 		 */
 		protected $fields=array();
+
+		/**
+		 * Массив ссылок на другие записи через внешние ключи.
+		 * 
+		 * Содержит в себе массивы типа:
+		 * 		array(
+		 * 			class - имя класса той записи
+		 * 			table - имя таблицы той записи
+		 * 			oId - имя поля индентификатора у той записи
+		 * 			otherKey - имя ключа у той записи, 
+		 * 			thisKey - имя ключа у текущей записи, 
+		 * 			direction - направление связи (from, to),
+		 * 			val - Zapis или массив Zapis,
+		 * 			mtm - связь многие ко многим array(
+		 * 				table - таблица со связями,
+		 * 				otherKey - имя ключа к той записи, 
+		 * 				thisKey - имя ключа к текущей записи
+		 * 				data - дополнительные данные, которые надо ввести в таблицу связей array(
+		 * 					имя поля => значение
+		 * 				)
+		 * 			) 
+		 * @var array
+		 */
+		protected $fks=array();
 
 		/**
 		 * Массив полей пустой записи. Ключи - имена полей.
@@ -85,10 +151,28 @@
 			$this->idField=$idField;
 			$this->useDatabaseId=$useDatabaseId;
 			$this->useIntId=$useIntId;
+			$this->setChangedStatus(self::NOCH);
 			if(!is_null($id)){
 				$this->select($id);
 			}			
 			
+		}
+		
+		/**
+		 * Используется для ввода дополнительных данных в таблицу связей многие ко многим.
+		 * 
+		 * @param string $method
+		 * @param array $par 0 - объект с которым связывается данны, 1 - массив в формате "имя поля"=>"значение поля"
+		 */
+		public function __call($method, $par){
+			if (isset($this->fks[$method]) && $this->fks[$method]['direction']==self::MMZAP){
+				$this->setChangedStatus(self::CH);
+				$num=count($this->fks[$method]['val']);
+				$this->fks[$method]['val'][$num]['val']=$par[0];
+				$this->fks[$method]['val'][$num]['data']=$par[1];
+			}else{
+				throw new MethodNotExistsException("Метод или связь $method не сущестует в классе ".get_class($this));
+			}
 		}
 		
 		/**
@@ -102,7 +186,44 @@
 			if (method_exists($this, $method)){
 				return $this->$method();
 			}
+			
+			if (isset($this->fks[$var])){
+				$this->setChangedStatus(self::CH);
+				$oKey=$this->fks[$var]['otherKey'];
+				$tKey=$this->fks[$var]['thisKey'];
+				$class=$this->fks[$var]['class'];
+				if (!$this->fks[$var]['val']){
+					if ($this->fks[$var]['direction']==self::FROMZAP){
+						$this->fks[$var]['val']=new $class(array($oKey=>$this->$tKey),$this->db);
+						if (!$this->fks[$var]['val']->exists()){ 
+							$this->fks[$var]['val']=null;
+						}
+					}elseif ($this->fks[$var]['direction']==self::TOZAP){
+						$idKey=$this->fks[$var]['oId'];
+						$oTable=$this->fks[$var]['table'];
+						$tKeyVal=$this->$tKey;
+						$ids=$this->db->getColumn("select $idKey from $oTable where $oKey=$tKeyVal");
+						foreach($ids as $itemId){
+							$this->fks[$var]['val'][]=new $class(array($idKey=>$itemId),$this->db);
+						}
+					}elseif ($this->fks[$var]['direction']==self::MMZAP){
+						$idKey=$this->fks[$var]['oId'];
+						$oTable=$this->fks[$var]['table'];
+						$tKeyVal=$this->$tKey;
+						$dopTKey=$this->fks[$var]['mtm']['thisKey'];
+						$dopOKey=$this->fks[$var]['mtm']['otherKey'];
+						$dopTable=$this->fks[$var]['mtm']['table'];
+						
+						$ids=$this->db->getColumn("select $idKey from $oTable join $dopTable on $oTable.$oKey=$dopTable.$dopOKey where $dopTKey=$tKeyVal");
+						foreach($ids as $itemId){
+							$this->fks[$var]['val'][]=new $class(array($idKey=>$itemId),$this->db);
+						}
+					}
+				}
+				return $this->fks[$var]['val'];
+			} 
 			if (isset($this->fields[$var])) return $this->fields[$var];
+			
 			return null;
 		}
 		
@@ -113,9 +234,26 @@
 		 * @param mixed $val Значение поля
 		 */
 		public function __set($var, $val){
+			$this->setChangedStatus(self::CH);
 			$method="set".ucfirst($var);
 			if (method_exists($this, $method)){
 				$this->$method($val);
+			}elseif (isset($this->fks[$var])){
+				$oKey=$this->fks[$var]['otherKey'];
+				$tKey=$this->fks[$var]['thisKey'];
+				if ($this->fks[$var]['direction']==self::TOZAP){
+					$this->fks[$var]['val'][]=$val;
+					if (isset($this->fields[$tKey])){
+						$val->$oKey=$this->fields[$tKey];
+					}else{
+						$val->$oKey=null;
+					}
+				}elseif ($this->fks[$var]['direction']==self::FROMZAP){
+					$this->fks[$var]['val']=$val;
+					$this->fields[$tKey]=$val->$oKey;
+				}else{
+					$this->fks[$var]['val'][]=$val;
+				}
 			}else{
 				$this->fields[$var]=$val;
 			}
@@ -125,7 +263,7 @@
 		 * Подготовка с сериализации
 		 */
 		public function __sleep(){
-			return array("table", "idField", "fields", "emptyFields", "useDatabaseId", "useIntId");
+			return array("table", "idField", "fks","fields", "emptyFields", "useDatabaseId", "useIntId");
 		}
 		
 		/**
@@ -162,6 +300,7 @@
 		 */
 		public function reset(){
 			$this->fields=array();
+			$this->setChangedStatus(self::CH);
 		}
 		
 		/**
@@ -181,15 +320,22 @@
 				$dbFields=$fields;
 			}
 			$row=$this->db->getAssoc(array("*"), $this->table, $dbFields);
-			$this->fields= $row ? $row : $this->emptyFields; 
+			$this->fields= $row ? $row : $this->emptyFields;
+			$this->setChangedStatus(self::NOCH);
 		}
+		
 		
 		/**
 		 * Устанавливает значения по умолчанию.
 		 */
 		public function selectDefault(){
 			$this->fields=$this->emptyFields;
+			foreach($this->fks as $k=>$v){
+				$this->fks[$k]['val']=null;
+			}
+			$this->setChangedStatus(self::NOCH);
 		}
+
 		/**
 		 * Вставка записи в таблицу.
 		 * 
@@ -198,31 +344,134 @@
 		 * Это нужно для заполнения значений по умолчанию и прочих значений, которые выставляются самой СУБД. 
 		 */
 		public function insert(){
+			if ($this->changed==self::NOCH || $this->changed==self::CHED) return false;
 			$fields=$this->fields;
-			if ($this->useDatabaseId && isset($fields[$this->idField])){
-				unset($fields[$this->idField]);
+			try{
+				$this->db->startTran();
+				$this->setChangedStatus(self::CHED);
+								
+				foreach($this->fks as $link){
+					if($link['val'] && $link['direction']==self::FROMZAP){
+						$link['val']->insertOrUpdate();
+						$oKey=$link['otherKey'];
+						$tKey=$link['thisKey'];
+						$fields[$tKey]=$link['val']->$oKey;
+					}
+				}
+			
+				if ($this->useDatabaseId && isset($fields[$this->idField])){
+					unset($fields[$this->idField]);
+				}
+				
+				$newId=$this->db->insert($fields, $this->table);
+				if ($this->useIntId){
+					$newId=(int)$newId;		
+				}
+				$this->select($newId);
+
+				foreach($this->fks as $link){
+					$oKey=$link['otherKey'];
+					$tKey=$link['thisKey'];
+					if($link['val'] && $link['direction']==self::TOZAP){
+						foreach($link['val'] as $zap){
+							$zap->$oKey=$this->fields[$tKey];
+							$zap->insertOrUpdate();
+						}
+					}
+					if($link['val'] && $link['direction']==self::MMZAP){
+						if (isset($fields[$tKey])){
+							$this->db->delete('delete from '.$link['mtm']['table'].' where '.$link['mtm']['thisKey'].'='.$fields[$tKey]);
+						}
+						foreach($link['val'] as $zap){
+							$data=array();
+							if (is_array($zap)){
+								$val=$zap['val'];
+								$data=$zap['data'];
+							}else{
+								$val=$zap;
+							}
+							$val->insertOrUpdate();
+							$dbTkey=$this->db->escapeString($this->fields[$tKey]);
+							$dbOkey=$this->db->escapeString($val->$oKey);
+							$data=array_merge($data,array($link['mtm']['thisKey']=>$dbTkey, $link['mtm']['otherKey']=>$dbOkey));
+							$this->db->insert($data, $link['mtm']['table']);
+						}
+					}
+				}
+			}catch(Exception $e){
+				$this->db->rollback();
+				$this->fields=$fields;
+				throw $e;
 			}
-			$newId=$this->db->insert($fields, $this->table);
-			if ($this->useIntId){
-				$newId=(int)$newId;		
-			}
-			$this->select($newId);
+			$this->db->commit();
+			return true;
 		}
 		
 		/**
 		 * Обновляет информацию в таблице в соответствии с данными объекта.
 		 */
 		public function update(){
+			if ($this->changed==self::NOCH || $this->changed==self::CHED) return false;
 			$fields=$this->fields;
 			$id=$fields[$this->idField];
-			if ($this->useDatabaseId){
-				unset($fields[$this->idField]);
+			try{
+				$this->db->startTran();
+				$this->setChangedStatus(self::CHED);
+				
+				foreach($this->fks as $link){
+					if($link['val'] && $link['direction']==self::FROMZAP){
+						$link['val']->insertOrUpdate();
+						$oKey=$link['otherKey'];
+						$tKey=$link['thisKey'];
+						$fields[$tKey]=$link['val']->$oKey;
+					}
+				}
+			
+				if ($this->useDatabaseId){
+					unset($fields[$this->idField]);
+				}
+				$this->db->update($fields, $this->table, array($this->idField=>$id));
+				if ($this->useDatabaseId){
+					$fields[$this->idField]=$id;
+				}
+				$this->select($fields[$this->idField]);
+				
+				foreach($this->fks as $link){
+					$oKey=$link['otherKey'];
+					$tKey=$link['thisKey'];
+					if($link['val'] && $link['direction']==self::TOZAP){
+						foreach($link['val'] as $zap){
+							$zap->$oKey=$this->fields[$tKey];
+							$zap->insertOrUpdate();
+						}
+					}
+					if($link['val'] && $link['direction']==self::MMZAP){
+						if (isset($fields[$tKey])){
+							$this->db->delete('delete from '.$link['mtm']['table'].' where '.$link['mtm']['thisKey'].'='.$fields[$tKey]);
+						}
+						foreach($link['val'] as $zap){
+							$data=array();
+							if (is_array($zap)){
+								$val=$zap['val'];
+								$data=$zap['data'];
+							}else{
+								$val=$zap;
+							}
+							$val->insertOrUpdate();
+							$dbTkey=$this->db->escapeString($this->fields[$tKey]);
+							$dbOkey=$this->db->escapeString($val->$oKey);
+							$data=array_merge($data,array($link['mtm']['thisKey']=>$dbTkey, $link['mtm']['otherKey']=>$dbOkey));
+							$this->db->insert($data, $link['mtm']['table']);
+						}
+					}
+				}
+			}catch(Exception $e){
+				$this->db->rollback();
+				$this->fields=$fields;
+				throw $e;
 			}
-			$this->db->update($fields, $this->table, array($this->idField=>$id));
-			if ($this->useDatabaseId){
-				$fields[$this->idField]=$id;
-			}
-			$this->select($fields[$this->idField]);
+			$this->db->commit();
+			return true;
 		}
 		
 		/**
@@ -246,6 +495,7 @@
 			$this->select($fields);
 			if (!$this->exists()){
 				$this->fields=$fields;
+				$this->setChangedStatus(self::CH);
 				$this->insert();
 			}								
 		}
@@ -254,7 +504,32 @@
 		 * Удаляет запись из таблицы.
 		 */
 		public function delete(){
-			$this->db->delete($this->table, array($this->idField=>$this->fields[$this->idField]));
+			if (!$this->exists()) return false;
+			try{
+				$this->db->startTran();
+				foreach($this->fks as $link){
+					$oKey=$link['otherKey'];
+					$tKey=$link['thisKey'];
+					if($link['val'] && $link['direction']==self::TOZAP){
+						foreach($link['val'] as $zap){
+							$zap->delete();
+						}
+					}
+					if($link['val'] && $link['direction']==self::MMZAP){
+						if (isset($this->fields[$tKey])){
+							$this->db->delete('delete from '.$link['mtm']['table'].' where '.$link['mtm']['thisKey'].'='.$this->fields[$tKey]);
+						}
+					}
+				}
+				$this->db->delete($this->table, array($this->idField=>$this->fields[$this->idField]));
+			}catch(Exception $e){
+				$this->db->rollback();
+				throw $e;
+			}
+			$this->db->commit();
+			$this->setChangedStatus(self::CH);
+			return true;
+			
 		}
 		
 		/**
@@ -263,7 +538,19 @@
 		 * @return bool true - если объект соответствует записи в базе, false - в противном случае.
 		 */
 		public function exists(){
-			return (bool)$this->fields && $this->id!=-1;
+			$idField=$this->idField;
+			return (bool)$this->fields && !is_null($this->$idField) && $this->$idField!=-1;
+		}
+		
+		/**
+		 * Устанавливает статус изменений в записи.
+		 * 
+		 * @param int $status Состояние записи относительно изменений.
+		 */
+		protected function setChangedStatus($status){
+			if ($status!=self::CH || $this->changed!=self::CHED){
+				$this->changed=$status;
+			}
 		}
 		
 	}

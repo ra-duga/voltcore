@@ -25,10 +25,23 @@
 	 */
 	function deepIconv($from, $to, $sbj){
 		if (is_array($sbj) || is_object($sbj)){
-			foreach ($sbj as &$val){ 
-				$val= deepIconv($from, $to, $val);
+			if (is_array($sbj)){
+				$rez=array();
+			}else{
+				$rez=new get_class($sbj);
 			}
-			return $sbj;
+			foreach ($sbj as $k=>$val){ 
+				$rezK=$k;
+				if (is_string($k)){
+					$rezK=iconv($from, $to, $k);
+				}
+				if (is_array($sbj)){
+					$rez[$rezK]= deepIconv($from, $to, $val);
+				}else{
+					$rez->$rezK= deepIconv($from, $to, $val);
+				}
+			}
+			return $rez;
 		}else{
 			return iconv($from, $to, $sbj);
 		}
@@ -138,3 +151,23 @@
 		return $data;
 		
 	}
+	
+	/**
+	 * Заменяет $str_pattern на $str_replacement в $string один раз.
+	 *
+	 * @author Oleg Butuzov
+	 * @link http://ru.php.net/manual/en/function.str-replace.php#102186
+	 * @param string $str_pattern Что заменять
+	 * @param string $str_replacement На что заменять
+	 * @param string $string Где заменять
+	 * @return string Результат замены
+	 */
+	function str_replace_once($str_pattern, $str_replacement, $string){ 
+        
+        if (strpos($string, $str_pattern) !== false){ 
+            $occurrence = strpos($string, $str_pattern); 
+            return substr_replace($string, $str_replacement, strpos($string, $str_pattern), strlen($str_pattern)); 
+        } 
+        
+        return $string; 
+    } 

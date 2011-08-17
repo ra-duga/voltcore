@@ -1,5 +1,5 @@
 <?php if(!$data) return; ?>
-<table <?php if ($tabId){ ?> id=<?php echo "'$tabId'"; ?> <?php } if ($class){ ?> class=<?php echo "'$class'"; ?>  <?php } ?>>
+<table <?php if ($tabId){echo "id='$tabId'";}?> <?php if ($class){echo "class='$class'"; } ?>>
 <?php if ($title){ ?>
 	<caption><?php echo $title; ?></caption>
 <?php } ?>
