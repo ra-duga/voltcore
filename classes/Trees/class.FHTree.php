@@ -92,8 +92,9 @@
 			$this->DB->insert("insert into $this->table($this->idField, $this->idParField, $this->levelField)	values($idChild, $idChild, 0)");
 		}
 	
-		protected function getSelectParent($idChild){
-			return "select $this->idParField from $this->table where $this->idField=$idChild and $this->levelField=1";
+		protected function doSelectParent($idChild){
+			$rez=$this->DB->getVal("select $this->idParField from $this->table where $this->idField=$idChild and $this->levelField=1");
+			return $rez;
 		}
 		
 		protected function doChangePar($idChild, $idParent, $orderNum=null){

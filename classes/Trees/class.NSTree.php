@@ -115,9 +115,10 @@
 			$this->DB->insert("insert into $this->table($this->idField, $this->leftField, $this->rightField, $this->levelField)values ($idChild, $childLeft, $childRight, $lev)");
 		}
 		
-		protected function getSelectParent($idChild){
-			return "select $this->idField from $this->table as tree join (select $this->leftField as lf, $this->rightField as rf, $this->levelField as lev from $this->table where $this->idField=$idChild)as t on
-					t.lf>tree.$this->leftField and t.rf<tree.$this->rightField and t.lev=tree.$this->levelField+1"; 
+		protected function doSelectParent($idChild){
+			$rez=$this->DB->getVal("select $this->idField from $this->table as tree join (select $this->leftField as lf, $this->rightField as rf, $this->levelField as lev from $this->table where $this->idField=$idChild)as t on
+					t.lf>tree.$this->leftField and t.rf<tree.$this->rightField and t.lev=tree.$this->levelField+1");
+			return $rez; 
 		}
 				
 		protected function doChangePar($idChild, $idParent, $orderNum=null){
