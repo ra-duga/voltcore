@@ -171,3 +171,33 @@
         
         return $string; 
     } 
+    
+    /**
+	 * Очищает библиографическое описание.
+	 *  
+	 * @param string $bo БО для очичистки.
+	 * @return string Чистое БО.
+	 */
+	function clearBo($bo){
+		$rezBo=html_entity_decode($bo,ENT_COMPAT, 'UTF-8');
+		$rezBo=strip_tags($rezBo);
+		
+		$rezBo=str_replace("- ","— ",$rezBo);
+		$rezBo=str_replace("/ "," / ",$rezBo);
+		$rezBo=str_replace(" /"," / ",$rezBo);
+
+		$rezBo=preg_replace("(([^A-Za-zА-Яа-я0-9])-)", "$1 — ", $rezBo); 
+		$rezBo=preg_replace("(\.([A-Za-zА-Яа-я]))", ". $1", $rezBo); 
+		$rezBo=preg_replace("(/([^A-Za-zА-Яа-я0-9]))", " / $1", $rezBo); 
+		$rezBo=preg_replace("(([^A-Za-zА-Яа-я0-9])/)", "$1 / ", $rezBo);
+		$rezBo=preg_replace("(([^0-9])—([^0-9]))", "$1 — $2", $rezBo);
+		$rezBo=preg_replace("(([0-9])\s?-\s?([0-9]))", "$1—$2", $rezBo);
+		$rezBo=preg_replace("(([0-9])\s?—\s?([0-9]))", "$1—$2", $rezBo);
+		$rezBo=preg_replace("( +)", " ", $rezBo);
+		$rezBo=str_replace("/ /","//",$rezBo);
+		$rezBo=trim($rezBo);
+		
+		return $rezBo;
+			
+	}
+    

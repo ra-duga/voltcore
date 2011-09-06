@@ -674,6 +674,7 @@
 		
 		public function __construct($id=null, $db=null){
 			$this->emptyFields=array("id"=>-1, "content"=>"default");
+			parent::__construct('MasterZap', $id, 'id', $db);
 			$this->fks=array(
 				'slave'=>array(
 					'class'=>'SlaveZapisTest',
@@ -694,7 +695,6 @@
 		  			'val'=>null,
 		  		)
 			);
-			parent::__construct('MasterZap', $id, 'id', $db);
 		}
 		
 		public function insert(){
@@ -727,6 +727,7 @@
 
 		public function __construct($id=null, $db=null){
 			$this->emptyFields=array("id"=>-1, "content"=>"default");
+			parent::__construct('AnotherZap', $id, 'id', $db);
 			$this->fks=array(
 				'super'=>array(
 					'class'=>'SuperMasterZapisTest',
@@ -744,7 +745,6 @@
 		 			) 
 		  		)
 			);
-			parent::__construct('AnotherZap', $id, 'id', $db);
 		}
 	}
 	

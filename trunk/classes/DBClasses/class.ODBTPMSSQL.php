@@ -189,12 +189,14 @@
 		 * Производит откат транзакции и включает autocommit.
 		 */
 		public function rollback(){
-			odbtp_rollback($this->link);
-			if ($this->getSystemVal("select @@TRANCOUNT as smth")==0){
+			if ($this->getSystemVal("select @@TRANCOUNT as smth")==1){
+				odbtp_rollback($this->link);
 				$temp=odbtp_set_attr(ODB_ATTR_TRANSACTIONS, ODB_TXN_NONE,$this->link);
 				if (!$temp){
 					throw new SqlException("Ошибка при выставлении параметра транзакций","Ошибка подключения","SET TRANSACTION ISOLATION LEVEL");
 				}
+			}else{
+				odbtp_rollback($this->link);
 			}
 		}
 

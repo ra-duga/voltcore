@@ -67,7 +67,7 @@
 		 * @param array $a Аргументы.
 		 */
 		public function __call($n, $a){
-			throw new FormatException("Не должно быть вызова несуществующего метода!","Ошибка кодирования");
+			throw new FormatException("Не должно быть вызова несуществующего метода! $n","Ошибка кодирования");
 		}
 		
 		/**

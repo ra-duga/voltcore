@@ -254,20 +254,19 @@
 		/**
 		 * Выполняет запросы для вставки нового листа в дерево.
 		 *
-		 * @param int $idChild Идентификатор того, у кого меняем родителя.
-		 * @param int $idParent Идентификатор нового родителя.
+		 * @param int $idChild Идентификатор того, кого вставляем.
+		 * @param int $idParent Идентификатор родителя.
 		 * @param int $orderNum Номер вставляемого узла по-порядку для сортировки.
-		 * @return array Запросы для вставки нового листа в дерево.
 		 */
 		abstract protected function doAddInsert($idChild, $idParent, $orderNum=null);
 
 		/**
-		 * Возвращает запрос для нахождения непосредственного родителя.
+		 * Возвращает непосредственного родителя.
 		 *
 		 * @param int $idChild Идентификатор того, у кого меняем родителя.
-		 * @return string Запрос для нахождения непосредственного родителя.
+		 * @return mixed Идентификатор непосредственного родителя.
 		 */
-		abstract protected function getSelectParent($idChild);
+		abstract protected function doSelectParent($idChild);
 		
 		/**
 		 * Выполняет запросы для смены родителя у узла.
@@ -648,8 +647,8 @@
 			$idChild=$this->getIdByName($id, $haveNames);
 			if($idChild==$this->rootId) return $this->rootId;
 			
-			$select=$this->getSelectParent($idChild);
-			$pid=$this->DB->getVal($select);
+			$pid=$this->doSelectParent($idChild);
+			
 
 			if (is_null($pid) || $pid===false) throw new SqlException("Идентификатор не найден","Нет данных",$select);
 			return $pid;

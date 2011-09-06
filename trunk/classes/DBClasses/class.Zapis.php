@@ -324,7 +324,6 @@
 			$this->setChangedStatus(self::NOCH);
 		}
 		
-		
 		/**
 		 * Устанавливает значения по умолчанию.
 		 */
@@ -341,15 +340,39 @@
 		 * 
 		 * Вставляет текущую запись в таблицу. 
 		 * Затем выбирает ее в текущий объект.
-		 * Это нужно для заполнения значений по умолчанию и прочих значений, которые выставляются самой СУБД. 
+		 * Это нужно для заполнения значений по умолчанию и прочих значений, которые выставляются самой СУБД.
+		 *  
+		 * @return bool true - если запрос выпонен. false - если запрос не было изменений или запись уже находится в процессе изменений
 		 */
 		public function insert(){
+			return $this->renewData('insert');
+		}
+		
+		/**
+		 * Обновляет информацию в таблице в соответствии с данными объекта.
+		 * 
+		 * @return bool true - если запрос выпонен. false - если запрос не было изменений или запись уже находится в процессе изменений
+		 */
+		public function update(){
+			return $this->renewData('update');
+		}
+		
+		/**
+		 * Обновляет данные в таблице, по сути выполняет insert или update запрос.
+		 * 
+		 * @param string $action Какой запрос выполнять.
+		 * @return bool true - если запрос выпонен. false - если запрос не было изменений или запись уже находится в процессе изменений
+		 */
+		protected function renewData($action){
 			if ($this->changed==self::NOCH || $this->changed==self::CHED) return false;
 			$fields=$this->fields;
+			if (isset($fields[$this->idField])){
+				$id=$fields[$this->idField];
+			}
 			try{
 				$this->db->startTran();
 				$this->setChangedStatus(self::CHED);
-								
+				
 				foreach($this->fks as $link){
 					if($link['val'] && $link['direction']==self::FROMZAP){
 						$link['val']->insertOrUpdate();
@@ -363,12 +386,20 @@
 					unset($fields[$this->idField]);
 				}
 				
-				$newId=$this->db->insert($fields, $this->table);
-				if ($this->useIntId){
-					$newId=(int)$newId;		
+				if ($action=='update'){
+					$this->db->update($fields, $this->table, array($this->idField=>$id));
+					if ($this->useDatabaseId){
+						$fields[$this->idField]=$id;
+					}
+					$newId=$fields[$this->idField];
+				}elseif ($action=='insert'){
+					$newId=$this->db->insert($fields, $this->table);
+					if ($this->useIntId){
+						$newId=(int)$newId;		
+					}
 				}
 				$this->select($newId);
-
+								
 				foreach($this->fks as $link){
 					$oKey=$link['otherKey'];
 					$tKey=$link['thisKey'];
@@ -405,73 +436,7 @@
 			}
 			$this->db->commit();
 			return true;
-		}
-		
-		/**
-		 * Обновляет информацию в таблице в соответствии с данными объекта.
-		 */
-		public function update(){
-			if ($this->changed==self::NOCH || $this->changed==self::CHED) return false;
-			$fields=$this->fields;
-			$id=$fields[$this->idField];
-			try{
-				$this->db->startTran();
-				$this->setChangedStatus(self::CHED);
-				
-				foreach($this->fks as $link){
-					if($link['val'] && $link['direction']==self::FROMZAP){
-						$link['val']->insertOrUpdate();
-						$oKey=$link['otherKey'];
-						$tKey=$link['thisKey'];
-						$fields[$tKey]=$link['val']->$oKey;
-					}
-				}
 			
-				if ($this->useDatabaseId){
-					unset($fields[$this->idField]);
-				}
-				$this->db->update($fields, $this->table, array($this->idField=>$id));
-				if ($this->useDatabaseId){
-					$fields[$this->idField]=$id;
-				}
-				$this->select($fields[$this->idField]);
-				
-				foreach($this->fks as $link){
-					$oKey=$link['otherKey'];
-					$tKey=$link['thisKey'];
-					if($link['val'] && $link['direction']==self::TOZAP){
-						foreach($link['val'] as $zap){
-							$zap->$oKey=$this->fields[$tKey];
-							$zap->insertOrUpdate();
-						}
-					}
-					if($link['val'] && $link['direction']==self::MMZAP){
-						if (isset($fields[$tKey])){
-							$this->db->delete('delete from '.$link['mtm']['table'].' where '.$link['mtm']['thisKey'].'='.$fields[$tKey]);
-						}
-						foreach($link['val'] as $zap){
-							$data=array();
-							if (is_array($zap)){
-								$val=$zap['val'];
-								$data=$zap['data'];
-							}else{
-								$val=$zap;
-							}
-							$val->insertOrUpdate();
-							$dbTkey=$this->db->escapeString($this->fields[$tKey]);
-							$dbOkey=$this->db->escapeString($val->$oKey);
-							$data=array_merge($data,array($link['mtm']['thisKey']=>$dbTkey, $link['mtm']['otherKey']=>$dbOkey));
-							$this->db->insert($data, $link['mtm']['table']);
-						}
-					}
-				}
-			}catch(Exception $e){
-				$this->db->rollback();
-				$this->fields=$fields;
-				throw $e;
-			}
-			$this->db->commit();
-			return true;
 		}
 		
 		/**
