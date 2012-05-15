@@ -13,42 +13,42 @@
 	
 	/**
 	 * Корень сайта.
-	 * 
 	 * @var string 
 	 */
-	define("DOCROOT",dirname(__FILE__));
+	define("SITEROOT",str_replace('\\','/',dirname(__FILE__)));
 
 	/**
 	 * Базовый адрес модуля.
-	 * 
 	 * @var string 
 	 */
-	define("URLROOT","http://mysite.com");
+	define("URLROOT","http://VoltCore.volt");
 	
 	/**
 	 * Директория c объектами.
-	 * 
 	 * @var string 
 	 */
-	define("OBJDIR",DOCROOT."/objs");
+	define("OBJDIR",SITEROOT."/objs");
 	
 	/**
 	 * Директория логов.
-	 * 
 	 * @var string 
 	 */
-	define("LOGDIR",DOCROOT."/admin/logs");
+	define("LOGDIR",SITEROOT."/logs");
 	
 	/**
 	 * Префикс файлов логов.
-	 * 
 	 * @var string 
 	 */
-	define("LOG_PREFIX","/mylog_");
+	define("LOG_PREFIX","/");
 	
+    /**
+     * Директория логов событий.
+     * @var string 
+     */
+    define("EVENTDIR",LOGDIR."/events");
+    
 	/**
 	 * Уровень ошибок для логирования.
-	 * 
 	 * @var int
 	 */
 	define("ERR_LOG_LEVEL",0);
