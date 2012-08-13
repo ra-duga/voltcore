@@ -52,10 +52,4 @@
      * Уровень ошибок для логирования.
      * @var int
      */
-    define("ERR_LOG_LEVEL",0);
-    
-    /**
-     * Подключение VoltCore
-     */
-    require_once("../VoltCore.php");
-    $siteConf = array();
+    define("ERR_LOG_LEVEL",0);   

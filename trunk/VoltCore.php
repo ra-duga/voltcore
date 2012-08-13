@@ -91,37 +91,10 @@
         define("ERR_LOG_LEVEL",0);
     }
     
-    require_once (VCROOT."/vc_ini.php");;
+    require_once (VCROOT."/vc_ini.php");
     if (!isset($siteConf) || !is_array($siteConf)){
         $siteConf = array();
     }
     
-    /**
-     * Обрабатывает ошибки, возникающие во время выполнения.
-     * 
-     * @access private 
-     * @param int $errno Номер ошибки
-     * @param string $errmsg Сообщение об ошибке
-     * @param string $file Файл, в котором возникла ошибка
-     * @param int $line Строка, в которой возникла ошибка
-     */
-    function VCErrorHandler($errno, $errmsg, $file, $line){
-        if ($errno>ERR_LOG_LEVEL){
-            throw new PHPException($errno, $errmsg, $file, $line);
-        }
-    }
-    
-    /**
-     * Обрабатывает не пойманные исключения.
-     * 
-     * @param Exception $e Исключение.
-     */
-    function VCExceptionHandler($e){
-        excLog($e, 'НЕ ПОЙМАЛИ!!!');
-    }
-    
-    set_error_handler('VCErrorHandler');
-    set_exception_handler ('VCExceptionHandler'); 
-    
-    Registry::getInstance()->config  = new Config($vf, $siteConf);
-    Registry::getInstance()->request = new Request();
+    set_error_handler(array('Error', 'errorHandler'));
+    set_exception_handler (array('Error', 'exceptionHandler')); 

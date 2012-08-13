@@ -32,6 +32,12 @@ class Request {
     private $post = null;
 
     /**
+     * Массив REQUEST
+     * @var array 
+     */
+    private $request = null;
+
+    /**
      * Массив COOKIE.
      * @var array 
      */
@@ -57,6 +63,7 @@ class Request {
     
     /**
      * Возвращает данное $var из массива $container.
+     * 
      * @param string $container Имя массива с данным.
      * @param string $var Имя данного.
      * @return mixed Данное или сам массив при отсутствии данного.
@@ -69,7 +76,8 @@ class Request {
         if (is_null($var)){
             return $this->$container;
         }
-        return $this->$container[$var];
+        
+        return isset($this->$container[$var]) ? $this->$container[$var] : null;
     }
     
     /**
@@ -100,6 +108,31 @@ class Request {
      */
     public function getCookie($var = null){
         return $this->get('cookie', $var);
+    }
+    
+    /**
+     * Возвращает данное если оно пришло от пользователя.
+     * 
+     * @param string $var Имя данного
+     * @return mixed Данное или совокупность GET, POST и COOKIE данных, если имя данного не указано.  
+     */
+    public function getREQUEST($var = null){
+        if(!$var){
+            return $this->get('request');
+        }
+        
+        $val = $this->getGET($var);
+        if ($val){
+            return $val;
+        }
+        
+        $val = $this->getPOST($var);
+        if ($val){
+            return $val;
+        }
+
+        $val = $this->getCookie($var);
+        return $val;
     }
     
     /**
@@ -141,6 +174,7 @@ class Request {
         $this->get      = $data['get'];
         $this->post     = $data['post'];
         $this->cookie   = $data['cookie'];
+        $this->request  = array_merge($data['get'], $data['post'], $data['cookie']);
         $this->server   = $data['server'];
         $this->postData = $data['postData'];
         $this->url      = $data['url'];
