@@ -172,6 +172,30 @@
         return $string; 
     } 
     
+	/**
+	 * Функция возвращает массив с именами файлов, которые соответствуют шаблону 
+	 * 
+	 * @param string $pattern шаблон, которому должны соответствовать имена файлов
+	 * @return array массив с именами файлов 
+	 */
+	function getFiles($pattern){
+		$rez=glob($pattern);
+		return  $rez ? $rez : array();
+	}
+	
+	/**
+	 * Создает путь до файла $file. 
+	 * 
+	 * @param string $file Адрес файла для которого создаются дирректории. 
+	 */
+	function makeDirs($file){
+		if (!file_exists(dirname($file))){
+			if (!mkdir(dirname($file), 0777, true)){
+				throw new FormatException("Не удалось создать дирректории","Некуда записывать");
+			}
+		}
+	}    
+    
     /**
 	 * Очищает библиографическое описание.
 	 *  

@@ -23,11 +23,6 @@
     define("VCROOT",str_replace('\\','/',dirname(__FILE__)));
     
     /**
-     * Подключение библиотеки логирования
-     */
-    require_once(VCROOT."/libs/lib.logger.php"); 
-
-    /**
      * Подключение библиотеки кэширования
      */
     require_once(VCROOT."/libs/lib.cache.php"); 
@@ -37,16 +32,6 @@
      */
     require_once(VCROOT."/libs/lib.voltLib.php"); 
 
-    /**
-     * Подключение функций работы с файлами.
-     */
-    require_once(VCROOT."/libs/lib.files.php"); 
-
-    /**
-     * Подключение функций работы с extJS.
-     */
-    require_once(VCROOT."/libs/lib.extJS.php"); 
-    
     /**
      * Подключение автозагрузчика
      */
