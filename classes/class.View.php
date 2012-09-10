@@ -107,6 +107,15 @@ class View {
 	}
 	    
     /**
+     * Устанавливает шаблон
+     * 
+     * @param string $tpl Путь к файлу шаблона
+     */
+    public function setTpl($tpl){
+        $this->tpl = $tpl;
+    }
+    
+    /**
      * Устанавливает тип представления
      * 
      * @param string $type Тип представления
@@ -121,22 +130,27 @@ class View {
 	 * Выдает данные в нужном виде. 
 	 */
 	public function show(){
-		switch($this->type){
+		$data = Registry::getResponse()->getResponseData();
+        switch($this->type){
 			case 'json':
-				echo json_encode($this->data);
+				echo json_encode($data);
 			break;
 			case 'html':
-				$data = $this->data;
 				if ($this->tpl){
 					$tpl = $this->tpl;
 				}else{
 					$tpl = Registry::getConfig()->defaultTpl;
 				}
-				include(DOCROOT.'tpls/'.$tpl);
+				$template = new Template($tpl);
+                $template->js    = $this->js;
+                $template->css   = $this->css;
+                $template->dopJs = $this->dopJs;
+                $template->arraySet($data);
+                echo $template;
 			break;
 			case 'test':
                 if (Registry::getConfig()->testMode){
-                    var_dump($this->data);
+                    var_dump($data);
                 }
 			break;
 		}

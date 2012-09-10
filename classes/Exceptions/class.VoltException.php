@@ -56,6 +56,6 @@
          * Логирует исключение 
          */
         protected function log(){
-            excLog($this);
+            Logger::excLog($this);
         }
     }

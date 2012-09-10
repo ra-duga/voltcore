@@ -35,7 +35,7 @@
                     $allFiles[$classname] = $file;
                 }
                 else {
-                    logMsg("Дубликат класса [{$classname}]. Источник [{$allFiles[$classname]}]", "FATAL");
+                    Logger::logMsg("Дубликат класса [{$classname}]. Источник [{$allFiles[$classname]}]", "FATAL");
                 }
             }
         }

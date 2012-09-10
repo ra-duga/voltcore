@@ -204,7 +204,7 @@
          * @param string $msg Сообщение которое нужно залогировать.
          */
         protected function logProgress($msg){
-            logToFile($msg, $this->progressFile);
+            Logger::logToFile($msg, $this->progressFile);
         }
         
         /**
@@ -214,6 +214,6 @@
          * @param string $type Тип ошибки.
          */
         protected function logError($msg, $type='Ошибка в данных'){
-            logToFile($msg, $this->logFile, $type);
+            Logger::logToFile($msg, $this->logFile, $type);
         }
     }
