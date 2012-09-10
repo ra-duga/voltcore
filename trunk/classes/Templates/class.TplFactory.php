@@ -55,7 +55,7 @@ abstract class TplFactory{
     protected function logErrorCall($mes, $file = null, $type = null){
         $file = $file ? $file : EVENTDIR.'/wrongTplQuery.log';
         $type = $type ? $type : 'Запрос несуществующего шаблона';
-        logToFile($mes, $file, $type,$_SERVER['REMOTE_ADDR']);
+        Logger::logToFile($mes, $file, $type,$_SERVER['REMOTE_ADDR']);
     }
 
     /**

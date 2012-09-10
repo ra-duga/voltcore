@@ -192,7 +192,7 @@ class Logger{
         if ($return){
             return $name." => ".$msg;
         }else{
-            logMsg($name." => ".$msg, $type, 'var', $masPar);
+            self::logMsg($name." => ".$msg, $type, 'var', $masPar);
         }
     }
 }

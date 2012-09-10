@@ -153,7 +153,7 @@
 					echo "<h2>$header</h2>";
 				}
 			}else{
-				logToFile($header.PHP_EOL, Tester::$logFile, 'test');
+				Logger::logToFile($header.PHP_EOL, Tester::$logFile, 'test');
 			}
 		} 
 		
@@ -167,7 +167,7 @@
 			if ($this->print){
 				echo "<p class='end'>Конец работы $header</p>";
 			}else{
-				logToFile("Конец работы $header".PHP_EOL, Tester::$logFile, 'test');
+				Logger::logToFile("Конец работы $header".PHP_EOL, Tester::$logFile, 'test');
 			}
 		} 
 		
@@ -181,7 +181,7 @@
 				echo "<div>$text</div>";
 			}else{
 				$text=strip_tags($text);
-				logToFile($text.PHP_EOL, Tester::$logFile, 'test');
+				Logger::logToFile($text.PHP_EOL, Tester::$logFile, 'test');
 			}
 		}
 		
@@ -196,8 +196,8 @@
 			if ($rez==$right){
 				$this->printText($title." => <span class='ok'>Успешно</span>");
 			}else{
-				$textRez=logVar($rez, "rez", true);
-				$textRight=logVar($right,"right",  true);
+				$textRez=Logger::logVar($rez, "rez", true);
+				$textRight=Logger::logVar($right,"right",  true);
 				$this->printText("<span class='testTitle'>$title</span> => <span class='err'>Ошибка</span>");
 				$this->printText("<p class='rez'>Получилось</p>");
 				$this->printText("<pre>$textRez</pre>");

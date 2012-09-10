@@ -766,7 +766,7 @@
 				$this->sql=$sql;
 			}
 			if ($vf["db"]["sqlShow"]) echo $sql, "<br>";
-			if ($vf["db"]["sqlLog"]) logMsg($sql,"SQL Log","sqlLog");
+			if ($vf["db"]["sqlLog"]) Logger::logMsg($sql,"SQL Log","sqlLog");
 			if ($this->needEnc){
 				$sql = iconv($this->encFile, $this->encDB,$sql);
 			}
