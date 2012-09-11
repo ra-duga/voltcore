@@ -7,11 +7,39 @@ abstract class AbstractController{
 	 */
 	protected $mainData;
 	
+    /**
+     * Обработка по умолчанию.
+     */
+    protected function getIndexInfo(){
+        Registry::getView()->show404();
+    }
+    
+    protected function setErrorInfo($data){
+        Registry::getView()->show404();
+        $file = EVENTDIR.'/wrongAction.log';
+        $type = 'Запрос несуществующего действия';
+        Logger::logToFile($data, $file, $type,$_SERVER['REMOTE_ADDR']);
+        
+    }
+    
 	/**
-	 * Выполняет полезнию работу 
+	 * Определяет какой метод вызвать, выполняет полезную работу
 	 */
-	abstract public function getOutput($data = null);
-	
+	public function compileResponse($data = null){
+        $this->mainData = $data;
+        $requestAction = Registry::getRequest()->getAction();
+        $action =  $requestAction  ?  $requestAction  : 'index';
+        $action =  $data['action'] ? $data['action'] : $action;
+        $method = "set".ucfirst($action)."Info";
+        
+        if (method_exists($this, $method)){
+            $this->$method();
+        }else{
+            $this->setErrorInfo($method);            
+        }
+
+    }    
+
 	/**
 	 * Создает массив ответа при удачном выполнении запроса.
 	 * 

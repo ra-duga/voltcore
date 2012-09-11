@@ -48,24 +48,15 @@ class GlobalController extends AbstractController {
 	/**
 	 * Действия до основных. 
 	 */
-	protected function beforeOutput(){
+	protected function beforeCompile(){
 		
 	}
 	
 	/**
 	 * Действия после основных. 
 	 */
-	protected function afterOutput(){
+	protected function afterCompile(){
 		
-	}
-	
-	/**
-	 * Возвращает данные по запросу.
-	 * 
-	 * @return array Результат запроса 
-	 */
-	public function getOutput($data = null){
-        return $this->fail('Не указано действие');
 	}
 	
 	/**
@@ -77,18 +68,32 @@ class GlobalController extends AbstractController {
 	public function compileResponse(){
 		try{
 			$this->init();
-			$this->controller = Registry::getRequest()->getController();
-
-			if (!$this->controller){
-				$this->controller = $this;
-			}
-			$this->beforeOutput();
+            $this->loadController();
+            $this->beforeCompile();
 
 			$this->controller->compileResponse($this->controllerData);
 
-			$this->afterOutput();
+			$this->afterCompile();
 		}catch(Exception $e){
 			Error::addException($e);
 		}
 	}
+    
+    /**
+     * Выбирает и устонавливает нужный контроллер
+     */
+    protected function loadController(){
+        $controllerName = Registry::getRequest()->getController(); 
+        if (!$controllerName){
+            $this->controller = $this;
+        }else{
+            $controllerName   = ucfirst($controllerName);
+            $this->controller = new $controllerName;
+        }
+
+        if (!$this->controller || !($this->controller instanceof AbstractController)){
+            $this->controller = new ErrorController();
+        }
+        
+    }
 }
