@@ -77,12 +77,22 @@
 		 * @return mixed Значение переменной
 		 */
 		public function __get($var){
+            return $this->get($var);
+		}
+        
+		/**
+		 * Получение значения переменной.
+		 * 
+		 * @param string $var Имя переменной
+		 * @return mixed Значение переменной
+		 */
+        public function get($var){
 			if(isset($this->vars[$var])){
 				return $this->vars[$var];
 			}else{
 				return null;
 			}
-		}
+        }
 		
 		/**
 		 * Магическая запись переменной в буфер.
@@ -91,9 +101,19 @@
 		 * @param mixed $val Значение переменной
 		 */
 		public function __set($var, $val){
-			$this->vars[$var]=$val;
+			$this->set($var, $val);
 		}
-		
+
+        /**
+		 * Запись переменной в буфер.
+		 * 
+		 * @param string $var Имя переменной
+		 * @param mixed $val Значение переменной
+		 */
+		public function set($var, $val){
+			$this->vars[$var] = $val;
+		}
+        
 		/**
 		 * Устанавливает путь к файлу шаблона из дирректории с шаблонами.
 		 * 
@@ -200,4 +220,21 @@
 			include($this->path);
 			return ob_get_clean();
 		}
+        
+        /**
+         * Возвращает данные шаблонов без информации о шаблонах.
+         * 
+         * @return array Данные
+         */
+        public function getClearData(){
+            $v = array();
+            foreach($this->vars as $k=>$var){
+                if ($var instanceof Template){
+                    $v[$k] = $var->getClearData();
+                }else{
+                    $v[$k] = $var;
+                }
+            }
+            return $v;
+        }
 	}
