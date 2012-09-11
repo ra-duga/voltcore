@@ -20,58 +20,75 @@
  * @package VoltCoreClasses
  * @subpackage OtherClasses
  */
-class Response {
+class Response extends Template{
 	
     /**
-     * Буфер переменных.
-     * @var array
+     * Конструктор
      */
-    private $vars = array();
+    public function __construct(){
+        //TODO Добавить в конфиг
+        $tpl = Registry::getConfig()->globalTpl;
+        parent::__construct($tpl);
+        //TODO Добавить в конфиг
+        $this->set('content', new Template(Registry::getConfig()->defaultContentTpl));
+        $this->set('js', array());
+        $this->set('css', array());
+        $this->set('dopJs', '');
+        
+    }
 
     /**
-     * Магическое получение данного из ответа
+     * Устанавливает шаблон контента
+     * @param type $tpl
+     */
+    public function setTpl($tpl){
+        $c = $this->get('content');
+        $c->setPath($tpl);
+    }
+    
+    /**
+     * Магическое получение значения переменной из контента
      * 
      * @param string $var Имя переменной
      * @return mixed Значение переменной
      */
     public function __get($var){
-		return $this->get($var);
-	}
-
-    /**
-     * Получение данного из ответа
-     * 
-     * @param string $var Имя переменной
-     * @return mixed Значение переменной
-     */
-	public function get($var){
-        if(isset($this->vars[$var])){
-            return $this->vars[$var];
-        }else{
-            return null;
-        }
-	}
+        return $this->getContentVar($var);
+    }
     
     /**
-     * Магическая запись в ответ.
+     * Магическая запись переменной в контент.
      * 
      * @param string $var Имя переменной
      * @param mixed $val Значение переменной
      */
     public function __set($var, $val){
-        $this->set($var, $val);
+        $this->setContentVar($var, $val);
     }
-	
+
     /**
-     * Запись в ответ.
+     * Получение значения переменной из контента.
+     * 
+     * @param string $var Имя переменной
+     * @return mixed Значение переменной
+     */
+    public function getContentVar($var){
+        $c = $this->get('content');
+        return $c->$var;
+    }
+    
+    /**
+     * Запись переменной в контент.
      * 
      * @param string $var Имя переменной
      * @param mixed $val Значение переменной
      */
-    public function set($var, $val){
-        $this->vars[$var] = $val;
+    public function setContentVar($var, $val){
+        $c = $this->get('content');
+        $c->$var = $val;
     }
-
+    
+    
     /**
      * Возвращает данные ответа
      * 
@@ -97,6 +114,80 @@ class Response {
 		}
 	}
     
+	/**
+	 * Устанавливает статус запроса как "Успешный"
+	 * 
+	 * @param string msg Сообщение об успехе
+	 */
+	public function success($msg = 'Сделано!'){
+        $this->set('success', true);
+        $this->set('msg', $msg);
+	}
+
+	/**
+	 * Устанавливает статус запроса как "Неуспешный"
+	 * 
+	 * @param mixed $errors Строка с ошибкой или массив ошибок
+	 * @param string msg Сообщение о провале
+	 */
+	public function fail($errors, $msg = ''){
+		global $conf;
+		if (is_string($errors)){
+			$errors = array($errors);
+		}
+        
+        $conf = Registry::getConfig()->error;
+        $errorsArr = array();
+        foreach($errors as $err){
+            if(isset($conf['messeges'][$err])){
+    			$errorsArr[] = array('msg' => $conf['messeges'][$err], 'code' => $err);
+            }else{
+    			$errorsArr[] = array('msg' => $conf['messeges'][0], 'code' => $err);
+            }
+        }
+            
+        $this->set('success', false);
+        $this->set('msg', $msg);
+        $this->setErrors($errorsArr);
+	}
     
-    
+    /**
+	 * Добавляет js в шаблон.
+	 * 
+	 * @param string $js Js файл для добавления
+	 */
+	public function addJs($js){
+		$locJs = $this->get('js');
+        if (is_array($js)){
+			$locJs = array_merge($locJs, $js);
+		}else{
+			$locJs[] = $js;
+		}
+        $this->set('js', $locJs);
+	}
+
+	/**
+	 * Добавляет css в шаблон.
+	 * 
+	 * @param string $css Css файл для добавления
+	 */
+	public function addCss($css){
+		$locCss = $this->get('css');
+		if (is_array($css)){
+			$locCss = array_merge($locCss, $css);
+		}else{
+			$locCss[] = $css;
+		}
+	}
+	
+	/**
+	 * Добавляет js код в шаблон
+	 * 
+	 * @param string $str Дополнительный js.
+	 */
+	public function addDopJs($str){
+		$dj  = $this->get('dopJs');
+        $dj .= $str;
+        $this->set('dopJs', $dj);
+	}
 }

@@ -29,90 +29,16 @@ class View {
 	public static $types = array('json', 'html', 'test');
 	
 	/**
-	 * Данные для представления.
-	 * @var array 
-	 */
-	protected $data;
-	
-	/**
 	 * Тип представления
 	 * @var string 
 	 */
 	protected $type;
 	
     /**
-     * Шаблон для вывода
-     * @var string
-     */
-    protected $tpl;
-    
-	/**
-	 * Дополнительный js
-	 * @var string 
-	 */
-	protected $dopJs = '';
-
-	/**
-	 * Массив js для шаблона
-	 * @var array 
-	 */
-	protected $js = array();
-
-	/**
-	 * Массив css для шаблона
-	 * @var array 
-	 */
-	protected $css = array();
-	
-    /**
      * Конструктор. Устанавливает тип представления по умолчанию 
      */
     public function __construct(){
         $this->type = Registry::getConfig()->getVC('viewType');
-    }
-    
-    /**
-	 * Добавляет js в шаблон.
-	 * 
-	 * @param string $js Js файл для добавления
-	 */
-	public function addJs($js){
-		if (is_array($js)){
-			$this->js = array_merge($this->js, $js);
-		}else{
-			$this->js[] = $js;
-		}
-	}
-
-	/**
-	 * Добавляет css в шаблон.
-	 * 
-	 * @param string $css Css файл для добавления
-	 */
-	public function addCss($css){
-		if (is_array($css)){
-			$this->css = array_merge($this->css, $css);
-		}else{
-			$this->css[] = $css;
-		}
-	}
-	
-	/**
-	 * Добавляет js код в шаблон
-	 * 
-	 * @param string $str Дополнительный js.
-	 */
-	public function addDopJs($str){
-		$this->dopJs .= $str;
-	}
-	    
-    /**
-     * Устанавливает шаблон
-     * 
-     * @param string $tpl Путь к файлу шаблона
-     */
-    public function setTpl($tpl){
-        $this->tpl = $tpl;
     }
     
     /**
@@ -132,27 +58,16 @@ class View {
 	public function show(){
 		$response = Registry::getResponse();
         $response->addDebugData();
-        $data = $response->getResponseData();
         switch($this->type){
 			case 'json':
-				echo json_encode($data);
+				echo json_encode($response->getClearData());
 			break;
 			case 'html':
-				if ($this->tpl){
-					$tpl = $this->tpl;
-				}else{
-					$tpl = Registry::getConfig()->defaultTpl;
-				}
-				$template = new Template($tpl);
-                $template->js    = $this->js;
-                $template->css   = $this->css;
-                $template->dopJs = $this->dopJs;
-                $template->arraySet($data);
-                echo $template;
+                echo $response;
 			break;
 			case 'test':
                 if (Registry::getConfig()->testMode){
-                    var_dump($data);
+                    var_dump($response->getResponseData());
                 }
 			break;
 		}
