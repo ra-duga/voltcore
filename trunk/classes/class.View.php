@@ -130,7 +130,9 @@ class View {
 	 * Выдает данные в нужном виде. 
 	 */
 	public function show(){
-		$data = Registry::getResponse()->getResponseData();
+		$response = Registry::getResponse();
+        $response->addDebugData();
+        $data = $response->getResponseData();
         switch($this->type){
 			case 'json':
 				echo json_encode($data);

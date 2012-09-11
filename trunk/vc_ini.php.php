@@ -43,7 +43,10 @@
     $vf["log"]["debug"]                    = LOGDIR.LOG_PREFIX."debug.log";            // Файл отладочной информации
     $vf["log"]["var"]                      = LOGDIR.LOG_PREFIX."var.log";                        // Файл с залогированными переменными 
     
-    $vf['log']['type'] = 3; // Куда логировать
+    $vf['log']['toOutput'] = false; //Выдавать ли логи в ответ
+    $vf['log']['type']     = 3; // Куда логировать
+
+    $vf['error']['toOutput'] = false; //Выдавать ли ошибки в ответ
     
     //Настройки исключений
     $vf["exc"]["excLog"]=true;                // Логировать ли исключения

@@ -81,4 +81,22 @@ class Response {
         return $this->vars;
     }
     
+	/**
+	 * Добавляет ошибки и лог в ответ. 
+	 */
+	public function addDebugData(){
+		$errors = Registry::getError()->getErrors();
+		$eConf  = Refistry::getConfig()->error;
+        if ($eConf['toOutput'] && $errors){
+			$this->set('sysErrors', $errors);
+		}
+		$logs = Logger::getLog();
+		$lConf  = Refistry::getConfig()->log;
+		if ($lConf['toOutput'] && $logs){
+			$this->set('log', $logs);
+		}
+	}
+    
+    
+    
 }

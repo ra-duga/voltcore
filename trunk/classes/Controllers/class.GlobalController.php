@@ -91,19 +91,4 @@ class GlobalController extends AbstractController {
 			Error::addException($e);
 		}
 	}
-	
-	/**
-	 * Добавляет ошибки и лог на выход. 
-	 */
-	protected function addDebugData(){
-		$errors = Registry::getError()->getErrors();
-		$eConf = Refistry::getConfig()->error;
-        if ($eConf['toOutput'] && isset($this->viewData['errors']) && is_array($this->viewData['errors'])){
-			$this->viewData['errors'] = array_merge($this->viewData['errors'], $errors);
-		}
-		$logs = Logger::getLog();
-		if ($conf['log']['toOutput'] && $logs){
-			$this->viewData['log'] = $logs;
-		}
-	}
 }
