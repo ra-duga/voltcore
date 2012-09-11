@@ -23,7 +23,7 @@ class Request {
      * Массив GET данных.
      * @var array 
      */
-    private $get = null;
+    private $get = array();
 
     /**
      * Массив POST данных.
@@ -57,9 +57,27 @@ class Request {
     
     /**
      * Адрес по которому пришли.
-     * @var type 
+     * @var string 
      */
     private $url = '';
+
+    /**
+     * Адрес по которому пришли, за вычетом строки запроса.
+     * @var string 
+     */
+    private $clearUrl = '';
+    
+    /**
+     * Какой конроллер надо вызвать
+     * @var string
+     */
+    private $controller;
+    
+    /**
+     * Какое действие должен выполнить контроллер
+     * @var string
+     */
+    private $action;
     
     /**
      * Возвращает данное $var из массива $container.
@@ -147,7 +165,8 @@ class Request {
     
     /**
      * Возвращает данные пришедшие POST'ом.
-     * @return string 
+     * 
+     * @return string Строка POST данных
      */
     public function getPostRawData(){
         if(is_null($this->postData)){
@@ -156,6 +175,11 @@ class Request {
         return $this->postData;
     }
     
+    /**
+     * URL, по которому пришли на страницу
+     * 
+     * @return string URL 
+     */
     public function getEnterUrl(){
         if (is_null($this->url)){
             $this->url = $_SERVER['REQUEST_URI'];
@@ -164,19 +188,80 @@ class Request {
     }
     
     /**
+     * URL, по которому пришли на страницу, за вычетом строки запроса
+     * 
+     * @return string URL 
+     */
+    public function getEnterUrlWithoutQuery(){
+        if (is_null($this->clearUrl)){
+            $this->clearUrl = str_replace($_SERVER['QUERY_STRING'],'', $_SERVER['REQUEST_URI']);
+        }
+        return $this->clearUrl;
+    }
+    
+    /**
+     * Вохвращает имя контроллера, который должен обработать запрос
+     * 
+     * @return string Имя контроллера
+     */
+    public function getController(){
+        return $this->controller;
+    }
+
+    /**
+     * Вохвращает имя действия, которое должен выполнить контроллер
+     * 
+     * @return string Имя контроллера
+     */
+    public function getAction(){
+        return $this->action;
+    }
+    
+    /**
      * Конструктор.
      * 
      * @param array $data Данные запроса.
      */
     public function __construct($data = array()){
-        if (!$data) return;
+        if (!$data){
+            $this->get = $_GET;
+            $this->parseUrlData();
+        }else{
+            $this->get      = $data['get'];
+            $this->post     = $data['post'];
+            $this->cookie   = $data['cookie'];
+            $this->request  = array_merge($data['get'], $data['post'], $data['cookie']);
+            $this->server   = $data['server'];
+            $this->postData = $data['postData'];
+            $this->url      = $data['url'];
+        }
+    }
+    
+    /**
+     * Вытаскивает данные из URL'а
+     */
+    private function parseUrlData(){
+        $this->controller = null;
+        $this->action     = null;
+        $url = trim($this->getEnterUrlWithoutQuery(),'/');
+        $urlParts = explode('/', $url);
+        $c = count($urlParts);
+        if ($c<1){
+            return;
+        }
 
-        $this->get      = $data['get'];
-        $this->post     = $data['post'];
-        $this->cookie   = $data['cookie'];
-        $this->request  = array_merge($data['get'], $data['post'], $data['cookie']);
-        $this->server   = $data['server'];
-        $this->postData = $data['postData'];
-        $this->url      = $data['url'];
+        $this->controller = $urlParts[0];
+
+        $params = array();
+        for($i = $c-1; $i > 0;$i = $i-2){
+            $params[$urlParts[$i-1]] = $urlParts[$i];
+        }
+
+        //Если количество частей оказалось четным, значит есть action и его надо удалить из get'a
+        if ($i != 0){
+            $this->action = $urlParts[1];
+            unset($params[$urlParts[0]]);
+        }
+        $this->get = array_merge($this->get, $params);
     }
 }
