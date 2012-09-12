@@ -11,14 +11,17 @@ abstract class AbstractController{
      * Обработка по умолчанию.
      */
     protected function getIndexInfo(){
-        Registry::getView()->show404();
+        Registry::getResponse()->show404();
     }
     
     protected function setErrorInfo($data){
-        Registry::getView()->show404();
-        $file = EVENTDIR.'/wrongAction.log';
-        $type = 'Запрос несуществующего действия';
-        Logger::logToFile($data, $file, $type,$_SERVER['REMOTE_ADDR']);
+        Registry::getResponse()->show404();
+        $logConf = Registry::getConfig()->log;
+        if($logConf['logUnknownAction']){
+            $file = EVENTDIR.'/wrongAction.log';
+            $type = 'Запрос несуществующего действия';
+            Logger::logToFile($data, $file, $type,$_SERVER['REMOTE_ADDR']);
+        }
         
     }
     

@@ -1,8 +1,8 @@
 <?
-define('PATHPUB', dirname(__FILE__)."/");
+define('PUBROOT', dirname(__FILE__)."/");
 
-require(PATHPUB."../platform.php");
-require(PATHPUB."../ini_".PLATFORM.".php");
+require(PUBROOT."../platform.php");
+require(PUBROOT."../ini_".PLATFORM.".php");
 
 $c = new MainController();
 $c->compileResponse();
