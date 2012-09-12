@@ -59,6 +59,15 @@ class GlobalController extends AbstractController {
 		
 	}
 	
+    /**
+     * Указывает показать страницу с ошибкой
+     * 
+     * @param Exception $data Неперехваченное контроллером исключение.
+     */
+    protected function setErrorInfo($data){
+        Registry::getResponse()->showError($data->getMessage());
+    }
+    
 	/**
 	 * Принимает запрос, проверяет права, запускает нужную обработку и возвращает результат.
 	 * 
@@ -70,12 +79,13 @@ class GlobalController extends AbstractController {
 			$this->init();
             $this->loadController();
             $this->beforeCompile();
-
-			$this->controller->compileResponse($this->controllerData);
-
+            if($this->controller){
+                $this->controller->compileResponse($this->controllerData);
+            }
 			$this->afterCompile();
 		}catch(Exception $e){
 			Error::addException($e);
+            $this->setErrorInfo($e);
 		}
 	}
     
@@ -85,14 +95,15 @@ class GlobalController extends AbstractController {
     protected function loadController(){
         $controllerName = Registry::getRequest()->getController(); 
         if (!$controllerName){
-            $this->controller = $this;
-        }else{
-            $controllerName   = ucfirst($controllerName);
-            $this->controller = new $controllerName;
+            $controllerName = Registry::getConfig()->defaultController;
         }
+        $controllerName   = ucfirst($controllerName);
+        $this->controller = new $controllerName;
 
         if (!$this->controller || !($this->controller instanceof AbstractController)){
-            $this->controller = new ErrorController();
+            $this->controller = null;
+            Logger::logToFile("Не удалось загрузить контроллер".$controllerName, EVENTDIR."/wrongController.log", 'Несуществующего контроллера или не контроллера');
+            Registry::getResponse()->show404();
         }
         
     }

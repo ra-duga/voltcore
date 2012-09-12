@@ -66,8 +66,14 @@
     $vf['dir']['classes'][]=VCROOT."/classes";    // Массив дирректорий из которых автолоад должен составить список классов.
     $vf['dir']['classes'][]=OBJDIR;
     
-    $vf["tpl"]["needCache"]=false;           // Кшировать ли шаблоны
-
+    $vf["tpl"]["needCache"]=false;           // Кэшировать ли шаблоны
+    $vf['tpl']['global'] = VCROOT."/Templates/global.tpl"; //Шаблон обвязки
+    $vf['tpl']['defaultContent'] = VCROOT."/Templates/content.tpl"; //Шаблон контента по умолчанию
+    $vf['tpl']['404'] = VCROOT."/Templates/404.tpl"; // Шаблон 404 страницы
+    $vf['tpl']['403'] = VCROOT."/Templates/403.tpl"; // Шаблон 403 страницы
+    $vf['tpl']['error'] = VCROOT."/Templates/error.tpl"; // Шаблон страницы с ошибкой
+    
+    
     //Настройки безопасности.
     $vf['security']['userRights']='1';       //Стратегия прав пользователей по умолчанию (0 - запрещать все, 1 - все разрешать)
     

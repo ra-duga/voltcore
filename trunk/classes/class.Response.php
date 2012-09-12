@@ -27,16 +27,47 @@ class Response extends Template{
      */
     public function __construct(){
         //TODO Добавить в конфиг
-        $tpl = Registry::getConfig()->globalTpl;
-        parent::__construct($tpl);
+        $tpl = Registry::getConfig()->tpl;
+        parent::__construct($tpl['global']);
         //TODO Добавить в конфиг
-        $this->set('content', new Template(Registry::getConfig()->defaultContentTpl));
+        $this->set('content', new Template($tpl['defaultContent']));
         $this->set('js', array());
         $this->set('css', array());
         $this->set('dopJs', '');
         
     }
 
+    /**
+     * Посылает заголовок "404 Not Found" и устанавливает шаблон 404 ошибки
+     */
+    public function show404(){
+        header("HTTP/1.0 404 Not Found"); 
+        header("HTTP/1.1 404 Not Found"); 
+        header("Status: 404 Not Found");
+        $tpl = Registry::getConfig()->tpl;
+        $this->setTpl($tpl['404']);
+    }
+
+    /**
+     * Посылает заголовок "403 Forbidden" и устанавливает шаблон 403 ошибки
+     */
+    public function show403(){
+        header("HTTP/1.0 403 Forbidden"); 
+        header("HTTP/1.1 403 Forbidden"); 
+        header("Status: 403 Forbidden");
+        $tpl = Registry::getConfig()->tpl;
+        $this->setTpl($tpl['403']);
+    }
+    
+    /**
+     * Устанавливает шаблон страницы ошибки
+     */
+    public function showError($msg){
+        $tpl = Registry::getConfig()->tpl;
+        $this->setTpl($tpl['error']);
+        $this->setContentVar('msg', $msg);
+    }
+    
     /**
      * Устанавливает шаблон контента
      * @param type $tpl
