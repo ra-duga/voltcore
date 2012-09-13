@@ -38,7 +38,6 @@ class GlobalController extends AbstractController {
 	 * Инициализация. 
 	 */
 	protected function init(){
-        Logger::init();
 		$a = Registry::getAuth();
 		$a->init();
 	
@@ -74,7 +73,7 @@ class GlobalController extends AbstractController {
 	 * @global array $conf Настройки.
 	 * @return View Представление для отображения. 
 	 */
-	public function compileResponse(){
+	public function compileResponse($data = null){
 		try{
 			$this->init();
             $this->loadController();
@@ -97,7 +96,7 @@ class GlobalController extends AbstractController {
         if (!$controllerName){
             $controllerName = Registry::getConfig()->defaultController;
         }
-        $controllerName   = ucfirst($controllerName);
+        $controllerName   = ucfirst($controllerName).'Controller';
         $this->controller = new $controllerName;
 
         if (!$this->controller || !($this->controller instanceof AbstractController)){

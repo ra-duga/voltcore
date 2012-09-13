@@ -88,8 +88,14 @@ class Request {
      */
     private function get($container, $var = null){
         if(is_null($this->$container)){
-            $globalArr = "_".strtoupper($container);
-            $this->$container = $$globalArr;
+            switch($container){
+                case 'get'    : $globalArr = $_GET;     break;
+                case 'post'   : $globalArr = $_POST;    break;
+                case 'cookie' : $globalArr = $_COOKIE;  break;
+                case 'server' : $globalArr = $_SERVER;  break;
+                case 'request': $globalArr = $_REQUEST; break;
+            }
+            $this->$container = $globalArr;
         }
         if (is_null($var)){
             return $this->$container;

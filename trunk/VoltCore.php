@@ -12,8 +12,8 @@
 
     date_default_timezone_set('Europe/Moscow');
     // Настройки вывода ошибок
-    error_reporting(E_ALL);
-    ini_set("display_errors", "off");
+/*    error_reporting(E_ALL);
+    ini_set("display_errors", "off");*/
     
     /**
      * Корень фреймворка.
@@ -83,3 +83,4 @@
     
     set_error_handler(array('Error', 'errorHandler'));
     set_exception_handler (array('Error', 'exceptionHandler')); 
+    Logger::init();

@@ -21,14 +21,10 @@
  * @subpackage Example
  */
 class MainController extends GlobalController {
-	
-	/**
-	 * Возвращает итог работы.
-	 * 
-	 * @return string итог работы 
-	 */
-	public function getOutput($data = null){
-		Registry::getResponse()->text = 'Работает';
-        Registry::getView()->setViewType('dumpData');
-	}
+    protected function afterCompile() {
+        $r = Registry::getResponse();
+        $r->set('header', '');
+        $r->set('footer', '');
+        $r->set('title', 'Пример использования VoltCore');
+    }
 }

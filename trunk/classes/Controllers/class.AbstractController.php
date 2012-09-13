@@ -10,7 +10,7 @@ abstract class AbstractController{
     /**
      * Обработка по умолчанию.
      */
-    protected function getIndexInfo(){
+    protected function setIndexInfo(){
         Registry::getResponse()->show404();
     }
     

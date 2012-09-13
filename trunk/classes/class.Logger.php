@@ -119,18 +119,16 @@ class Logger{
      * Файл находится в директории $vf["log"]["dir"]. В случае отсутствия файла - файл создается.
      * Сообщение записывается в виде $mes."|".$type."|File: ...; Line:...; |".date("d-m-Y H:i:s").PHP_EOL.
      * 
-     * @param Exception $e исключение для логирования.
+     * @param object $e исключение для логирования.
      * @param string $extMsg Дополнительное сообщение.
      */
-    public static function excLog($e, $extMsg){
-        $par  = "File:".$e->getFile().";";
-        $par .= "Line:".$e->getLine().";";
-        $type='debug';
-        if ($e instanceof VoltException){
-            $type=$e->getType();
-        }
-        if ($e instanceof SqlException){
-            $par=PHP_EOL.$e->getSql().PHP_EOL."|".$par;
+    public static function excLog($e, $extMsg=''){
+        if (method_exists($e, 'getLogMsg')){
+            list($par, $type) = $e->getLogMsg();
+        }else{
+            $par  = "File:".$e->getFile().";";
+            $par .= "Line:".$e->getLine().";";
+            $type = '';
         }
         $fil=get_class($e);
         if(!in_array($fil, self::$conf)){
@@ -160,7 +158,11 @@ class Logger{
             $masPar=implode("|",$masPar);
         }
         $logText=$mes."|".$masPar."|".$type."|".date("d-m-Y H:i:s")."\r\n";
-        $logFile=self::$conf[$fil];
+        if (isset(self::$conf[$fil])){
+            $logFile=self::$conf[$fil];
+        }else{
+            $logFile=self::$conf['log'];
+        }
         
 		if(self::$conf['type'] & self::TYPE_FILE){
             makeDirs($logFile);
