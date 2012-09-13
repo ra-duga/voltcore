@@ -36,25 +36,21 @@
     $vf["log"]["mailLog"]                  = LOGDIR.LOG_PREFIX."mail.log";            // Файл сообщений(ошибок) возникших при работе с почтой
     $vf["log"]["Exception"]                = LOGDIR.LOG_PREFIX."exceptions.log";    // Файл сообщений(ошибок) о возникших исключениях
     $vf["log"]["VoltException"]            = LOGDIR.LOG_PREFIX."exceptions.log";    // Файл сообщений(ошибок) о возникших VoltException исключениях
-    $vf["log"]["FormatException"]          = LOGDIR.LOG_PREFIX."exceptions.log";    // Файл сообщений(ошибок) о возникших FormatException исключениях
-    $vf["log"]["TestException"]            = LOGDIR.LOG_PREFIX."exceptions.log";    // Файл сообщений(ошибок) о возникших TestException исключениях
-    $vf["log"]["MethodNotExistsException"] = LOGDIR.LOG_PREFIX."exceptions.log";    // Файл сообщений(ошибок) о возникших MethodNotExistsException исключениях
     $vf["log"]["SqlException"]             = LOGDIR.LOG_PREFIX."sql.log";    // Файл сообщений(ошибок) о возникших SqlException исключениях
     $vf["log"]["debug"]                    = LOGDIR.LOG_PREFIX."debug.log";            // Файл отладочной информации
     $vf["log"]["var"]                      = LOGDIR.LOG_PREFIX."var.log";                        // Файл с залогированными переменными 
     
     $vf['log']['toOutput'] = false; //Выдавать ли логи в ответ
     $vf['log']['type']     = 3; // Куда логировать
+    $vf['log']['logUnknownAction'] = true; // Логировать ли запрос несуществующего дейсвия
+    
 
     $vf['error']['toOutput'] = false; //Выдавать ли ошибки в ответ
+    $vf['error']['errorToException'] = true; //Повышать ошибки до исключений
     
     //Настройки исключений
     $vf["exc"]["excLog"]=true;                // Логировать ли исключения
-    $vf["exc"]["SqlException"]=true;        // Логировать ли SqlException
-    $vf["exc"]["FormatException"]=true;        // Логировать ли FormatException
     $vf["exc"]["TestException"]=false;        // Логировать ли TestException
-    $vf["exc"]["MethodNotExistsException"]=true;        // Логировать ли MethodNotExistsException
-    $vf["exc"]["VoltException"]=true;        // Логировать ли VoltException
     
     //Стандартные дирректории
     $vf["dir"]["js"]    = DOCROOT."/js";          // Дирректория с javascript файлами
@@ -82,3 +78,5 @@
     $vf["cache"]["defType"]="file";          // Куда кэшировать по умолчанию. (file)
     
     $vf["test"]["db"]="VoltCore_Test";       //Имя базы данных для самотестирования.
+    
+    $vf['defaultController'] = 'context';

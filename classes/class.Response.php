@@ -45,7 +45,7 @@ class Response extends Template{
         header("HTTP/1.1 404 Not Found"); 
         header("Status: 404 Not Found");
         $tpl = Registry::getConfig()->tpl;
-        $this->setTpl($tpl['404']);
+        $this->setFullTpl($tpl['404']);
     }
 
     /**
@@ -56,7 +56,7 @@ class Response extends Template{
         header("HTTP/1.1 403 Forbidden"); 
         header("Status: 403 Forbidden");
         $tpl = Registry::getConfig()->tpl;
-        $this->setTpl($tpl['403']);
+        $this->setFullTpl($tpl['403']);
     }
     
     /**
@@ -64,17 +64,28 @@ class Response extends Template{
      */
     public function showError($msg){
         $tpl = Registry::getConfig()->tpl;
-        $this->setTpl($tpl['error']);
+        $this->setFullTpl($tpl['error']);
         $this->setContentVar('msg', $msg);
     }
     
     /**
      * Устанавливает шаблон контента
-     * @param type $tpl
+     * 
+     * @param string $tpl Путь к шаблону относительно DOCROOT/Templates
      */
     public function setTpl($tpl){
         $c = $this->get('content');
         $c->setPath($tpl);
+    }
+
+    /**
+     * Устанавливает шаблон контента
+     * 
+     * @param string $tpl Абсолютный путь к шаблону
+     */
+    public function setFullTpl($tpl){
+        $c = $this->get('content');
+        $c->setFullPath($tpl);
     }
     
     /**
@@ -134,12 +145,12 @@ class Response extends Template{
 	 */
 	public function addDebugData(){
 		$errors = Registry::getError()->getErrors();
-		$eConf  = Refistry::getConfig()->error;
+		$eConf  = Registry::getConfig()->error;
         if ($eConf['toOutput'] && $errors){
 			$this->set('sysErrors', $errors);
 		}
 		$logs = Logger::getLog();
-		$lConf  = Refistry::getConfig()->log;
+		$lConf  = Registry::getConfig()->log;
 		if ($lConf['toOutput'] && $logs){
 			$this->set('log', $logs);
 		}

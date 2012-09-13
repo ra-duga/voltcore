@@ -61,8 +61,4 @@ class PHPException extends VoltException{
         $errmsg .= '|'.$file.'|'.$line;
         parent::__construct($errmsg,$type,$errno, $previous);
     }
-
-    public function getSql(){
-        return $this->sql;
-    }
 }

@@ -37,7 +37,7 @@
          */
         public function __construct($mes, $type, $code=0, Exception $previous = NULL){
             global $vf;
-            parent::__construct($mes, $code);
+            parent::__construct($mes, $code, $previous);
             $this->type=$type;
             if ($vf["exc"]["excLog"] && (!isset($vf["exc"][get_class($this)]) || $vf["exc"][get_class($this)])){
                 $this->log();
@@ -57,5 +57,18 @@
          */
         protected function log(){
             Logger::excLog($this);
+        }
+        
+        /**
+         * Возвращает дополнительные данные об исключении
+         * 
+         * @return array Данные и тип исключения
+         */
+        public function getLogMsg(){
+            $par  = "File:".$this->getFile().";";
+            $par .= "Line:".$this->getLine().";";
+            $type = $this->getType();
+            return array($par, $type);
+            
         }
     }

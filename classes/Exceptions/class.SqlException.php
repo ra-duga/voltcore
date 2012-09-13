@@ -36,8 +36,20 @@
 			parent::__construct($mes,$type,$code, $previous);
 		}
 		
+        /**
+         * Возвращает запрос вызвавший исключение.
+         * 
+         * @return string Запрос
+         */
 		public function getSql(){
 			return $this->sql;
 		}
+        
+        public function getLogMsg(){
+            $par = parent::getLogMsg();
+            $par['par'] = PHP_EOL.$this->getSql().PHP_EOL."|".$par['par'];
+            return $par;
+        }
+        
 	}
 ?>

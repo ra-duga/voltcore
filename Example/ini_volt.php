@@ -18,8 +18,10 @@
     /**
      * Подключение VoltCore
      */
-    require_once("../VoltCore.php");
+    require_once(SITEROOT."/../VoltCore.php");
     $vf['testMode'] = true;
+    $vf['error']['errorToException'] = false;    
+
     $siteConf = array();
     
     
